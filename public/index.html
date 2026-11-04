@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Citizen One | Civic reporting guides</title>
+<meta name="description" content="Simple, searchable guides for reporting civic issues through the right official channel in Maharashtra.">
+<link rel="canonical" href="/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#17634a">
+<meta name="ga-measurement-id" content="">
+<meta property="og:title" content="Citizen One | Civic reporting guides">
+<meta property="og:description" content="Find the right authority, evidence checklist and escalation path for civic issues.">
+<meta property="og:type" content="website">
+<style>
+:root{--bg:#f6f7f4;--surface:#fff;--surface-2:#eef3ee;--ink:#17211c;--muted:#6d786f;--line:#dfe7e0;--brand:#17634a;--brand-dark:#104734;--accent:#e8f4ec;--orange:#f5ead3;--shadow:0 12px 40px rgba(23,46,34,.07)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+a{color:var(--brand)}
+.shell{max-width:1220px;margin:auto;padding:0 28px 72px}
+.skip-link{position:fixed;left:16px;top:-60px;z-index:1000;background:var(--brand);color:#fff;padding:9px 13px;border-radius:8px;text-decoration:none}.skip-link:focus{top:12px}
+.scroll-progress{position:fixed;z-index:900;left:0;top:0;height:3px;width:0;background:var(--brand);transition:width .05s linear}
+.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:100;background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:11px;color:var(--ink);text-decoration:none;font-weight:760;letter-spacing:-.02em;font-size:17px}
+.brand-mark{width:33px;height:33px;border-radius:11px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.topnote{color:var(--muted);font-size:13px}
+.site-nav{display:flex;align-items:center;gap:18px}.site-nav a{color:var(--muted);text-decoration:none;font-size:13px}.site-nav a:hover{color:var(--brand)}.site-nav button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 9px}.menu-toggle{display:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 9px;font-size:18px}
+.hero{padding:74px 0 40px;max-width:820px}
+.eyebrow{margin:0 0 13px;color:var(--brand);font-size:12px;font-weight:750;letter-spacing:.11em;text-transform:uppercase}
+h1{margin:0;max-width:740px;font-size:clamp(36px,5vw,64px);line-height:1.03;letter-spacing:-.065em;font-weight:760}
+.hero-copy{max-width:650px;margin:20px 0 28px;color:var(--muted);font-size:18px;line-height:1.55}
+.search-wrap{max-width:760px;position:relative}
+.search-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--brand);font-size:21px;pointer-events:none}
+#search{width:100%;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow);padding:18px 50px;font-size:17px;color:var(--ink);outline:none}
+#search:focus{border-color:var(--brand);box-shadow:0 0 0 4px var(--accent)}
+.clear{display:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--muted);font-size:20px;padding:4px 8px}
+.search-hint{margin:9px 4px 0;color:var(--muted);font-size:12px}
+.content-grid{display:grid;grid-template-columns:240px minmax(0,1fr);gap:44px;align-items:start}
+.side{position:sticky;top:22px}
+.side-title{margin:0 0 12px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:760}
+.filter-group+.filter-group{margin-top:28px}
+.category-list{display:flex;flex-direction:column;gap:3px}
+.category{border:0;background:transparent;color:var(--muted);text-align:left;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.category:hover{background:var(--surface-2);color:var(--ink)}
+.category.active{background:var(--brand);color:#fff}
+.count{font-size:12px;opacity:.7}
+.side-tip{margin-top:34px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font-size:13px;color:var(--muted)}
+.side-tip strong{display:block;color:var(--ink);margin-bottom:5px}
+.results-head{display:flex;justify-content:space-between;align-items:baseline;gap:18px;border-bottom:1px solid var(--line);padding-bottom:13px;margin-bottom:18px}
+.results-head h2{margin:0;font-size:20px;letter-spacing:-.03em}
+#result-count{color:var(--muted);font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:20px;min-height:196px;display:flex;flex-direction:column;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.card:hover{transform:translateY(-2px);border-color:#b8cdbd;box-shadow:var(--shadow)}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.pill{display:inline-flex;width:max-content;max-width:100%;padding:4px 9px;border-radius:99px;background:var(--accent);color:var(--brand);font-size:11px;font-weight:750;letter-spacing:.03em}
+.pill.draft{background:var(--orange);color:#7c5b1c}
+.card h3{margin:0;font-size:18px;line-height:1.25;letter-spacing:-.025em}
+.card p{margin:9px 0 16px;color:var(--muted);line-height:1.5}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:11px;color:var(--muted);background:var(--bg);padding:3px 7px;border-radius:5px}
+.read{border:0;background:transparent;color:var(--brand);font-size:13px;font-weight:750;white-space:nowrap;padding:3px 0}
+.read:hover{text-decoration:underline}
+.empty{padding:40px 0;color:var(--muted);text-align:center;border:1px dashed var(--line);border-radius:16px;display:none}
+.empty strong{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+.detail{display:none;max-width:820px}
+.detail.standalone-detail{display:block;grid-column:1 / -1;max-width:860px;margin:0 auto;width:100%}
+.breadcrumbs{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:13px;margin:5px 0 30px}.breadcrumbs a{color:var(--brand);text-decoration:none}.breadcrumbs span:last-child{overflow-wrap:anywhere}
+.back{border:0;background:transparent;color:var(--brand);padding:0;margin:0 0 27px;font-weight:700}
+.detail-head{padding-bottom:30px;border-bottom:1px solid var(--line)}
+.detail h2{font-size:clamp(30px,4vw,47px);line-height:1.08;letter-spacing:-.055em;margin:16px 0 13px}
+.detail-summary{font-size:18px;color:var(--muted);margin:0;max-width:690px}
+.last-updated{font-size:12px;color:var(--muted);margin:16px 0 0}.detail-actions{display:flex;gap:9px;flex-wrap:wrap;padding:25px 0}.copy-button,.print-button,.primary-link{border:1px solid var(--line);background:var(--surface);color:var(--brand);border-radius:9px;padding:9px 13px;text-decoration:none;font-weight:700;cursor:pointer}.copy-button:hover,.print-button:hover,.primary-link:hover{border-color:var(--brand);background:var(--accent)}.back-link{margin:0 0 25px}.simple-page{padding-bottom:60px}.simple-page h1{max-width:800px}.simple-page h2{font-size:21px;margin:0 0 8px}.error-page{text-align:center;padding:80px 0}.error-page .eyebrow{font-size:13px}
+.detail-section{padding:28px 0;border-bottom:1px solid var(--line)}
+.detail-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--brand);margin:0 0 10px}
+.detail-section p{margin:0;max-width:720px;white-space:pre-line}
+.channels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:17px}
+.channel{padding:13px 14px;background:var(--surface);border:1px solid var(--line);border-radius:11px}
+.channel strong{display:block;font-size:13px;margin-bottom:3px}
+.channel span{display:block;color:var(--muted);font-size:13px;line-height:1.45}
+.steps,.checklist{padding:0;margin:15px 0 0;list-style:none;display:grid;gap:8px;max-width:700px}
+.steps li,.checklist li{display:flex;gap:10px;align-items:flex-start}
+.steps li:before{content:counter(item);counter-increment:item;display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:50%;background:var(--accent);color:var(--brand);font-size:12px;font-weight:800}
+.steps{counter-reset:item}
+.checklist li:before{content:"✓";display:grid;place-items:center;flex:0 0 24px;height:24px;border-radius:50%;background:var(--accent);color:var(--brand);font-weight:800}
+.sources{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.sources a{font-size:12px;background:var(--surface-2);padding:7px 10px;border-radius:7px;text-decoration:none}
+.footer{margin-top:75px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:12px}.footer a{color:inherit;text-decoration:none}.footer a:hover{color:var(--brand)}
+.faq{margin:62px 0 0;border-top:1px solid var(--line);padding-top:25px;max-width:780px}.faq h2{font-size:20px;letter-spacing:-.03em;margin:0 0 12px}.faq details{border-bottom:1px solid var(--line);padding:13px 0}.faq summary{cursor:pointer;font-weight:700}.faq p{color:var(--muted);margin:8px 0 0}.floating-contact,.to-top{position:fixed;z-index:80;right:22px;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:99px;text-decoration:none;cursor:pointer}.floating-contact{bottom:22px;background:var(--brand);color:#fff;padding:11px 15px;font-weight:700}.to-top{display:none;bottom:70px;background:var(--surface);color:var(--brand);width:38px;height:38px;place-items:center;font-size:18px}.toast{position:fixed;left:50%;bottom:23px;z-index:110;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:9px;font-size:13px;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}.cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:120;display:none;align-items:center;justify-content:space-between;gap:18px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:14px;padding:14px 16px;color:var(--muted);font-size:13px}.cookie-banner.show{display:flex}.cookie-banner strong{color:var(--ink)}.cookie-actions{display:flex;gap:8px;flex:0 0 auto}.cookie-actions button{border:1px solid var(--line);background:var(--surface);color:var(--brand);border-radius:8px;padding:7px 10px;font-weight:700}.cookie-actions .accept{background:var(--brand);color:#fff;border-color:var(--brand)}
+.privacy-value{transition:filter .15s}.privacy-blur .privacy-value{filter:blur(5px);user-select:none}
+.skeleton{height:130px;border-radius:16px;background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);background-size:400% 100%;animation:shimmer 1.3s infinite}@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.detail-section a,.channel a{overflow-wrap:anywhere}
+:root[data-theme="dark"]{--bg:#111713;--surface:#19221c;--surface-2:#223128;--ink:#edf5ee;--muted:#a8b7ab;--line:#304237;--brand:#6fca9e;--brand-dark:#b9f1cf;--accent:#213e2d;--orange:#3d331d;--shadow:0 12px 40px rgba(0,0,0,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111713;--surface:#19221c;--surface-2:#223128;--ink:#edf5ee;--muted:#a8b7ab;--line:#304237;--brand:#6fca9e;--brand-dark:#b9f1cf;--accent:#213e2d;--orange:#3d331d;--shadow:0 12px 40px rgba(0,0,0,.25)}}
+@media print{.topbar,.side,.search-wrap,.search-hint,.footer,.floating-contact,.to-top,.cookie-banner,.detail-actions,.back-link,.faq{display:none!important}.shell{max-width:none;padding:0}.detail,.detail.standalone-detail{display:block!important;max-width:none}.detail-section{break-inside:avoid}body{background:#fff;color:#000}.detail h1{font-size:34px}.channel{border:1px solid #bbb}}
+.loading{color:var(--muted);padding:26px 0}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:850px){.shell{padding:0 20px 54px}.hero{padding:52px 0 34px}.content-grid{grid-template-columns:1fr;gap:27px}.side{position:static}.category-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.category{min-width:0;background:var(--surface);border:1px solid var(--line);overflow-wrap:anywhere}.category.active{border-color:var(--brand)}.side-tip{display:none}.cards{grid-template-columns:1fr}.footer{margin-top:52px}.site-nav{display:none;position:absolute;left:20px;right:20px;top:68px;padding:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch;gap:3px}.site-nav.open{display:flex}.site-nav a,.site-nav button{text-align:left;padding:10px}.menu-toggle{display:block}.cookie-banner{align-items:flex-start;flex-direction:column}.cookie-actions{width:100%}.cookie-actions button{flex:1}}
+@media(max-width:520px){.topnote{display:none}.topbar{height:68px}.hero-copy{font-size:16px}.channels{grid-template-columns:1fr}.results-head{align-items:flex-start;flex-direction:column;gap:3px}.category-list{grid-template-columns:1fr}.card{padding:17px}.card-bottom{align-items:flex-end}.floating-contact{right:14px;bottom:14px}.to-top{right:14px;bottom:64px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+<div class="shell">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Citizen One home"><span class="brand-mark">C1</span><span>Citizen One</span></a>
+    <nav id="site-nav" class="site-nav" aria-label="Primary"><a href="/">Guides</a><a href="/about">About</a><a href="#faq">FAQ</a><a href="/privacy">Privacy</a><a href="/admin">Admin</a><button type="button" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">◐</button><button type="button" data-privacy-toggle aria-label="Toggle privacy view" aria-pressed="false">◉</button></nav>
+    <span class="topnote">Open civic reporting guides</span>
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="home-view">
+      <p class="eyebrow">A calmer way to take action</p>
+      <h1>Find the right way to report it.</h1>
+      <p class="hero-copy">Search plain-language guides for civic issues in Maharashtra. Know who handles the problem, what evidence to keep and what to do next.</p>
+      <div class="search-wrap">
+        <label class="sr" for="search">Search civic reporting guides</label>
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="search" type="search" autocomplete="off" aria-label="Search issues, authorities or places" autofocus>
+        <button id="clear" class="clear" type="button" aria-label="Clear search">×</button>
+      </div>
+      <p class="search-hint">Try “no parking”, “illegal hawkers”, “bribe”, “food poisoning” or “ward office”.</p>
+    </section>
+
+    <div class="content-grid" id="browse-view">
+      <aside class="side" aria-label="Browse categories">
+        <div class="filter-group"><p class="side-title">Filter by location</p><div class="category-list" id="locations"><div class="loading">Loading…</div></div></div>
+        <div class="filter-group"><p class="side-title">Filter by category tag</p><div class="category-list" id="categories"><div class="loading">Loading…</div></div></div>
+        <div class="side-tip"><strong>For developers</strong>Edit <code>locations</code>, <code>categories</code> and <code>tags</code> inside <code>data/articles.json</code>. Add new available filters in <code>data/tags.json</code>.</div>
+      </aside>
+
+      <section class="listing" aria-live="polite">
+        <div class="results-head"><h2 id="results-title">All guides</h2><span id="result-count"></span></div>
+        <div id="cards" class="cards"><p class="loading">Loading guides…</p></div>
+        <div id="empty" class="empty"><strong>No close match yet</strong>Try a broader phrase or choose a category. You can also add a new article to <code>data/articles.json</code>.</div>
+      </section>
+
+      <section class="detail" id="detail-view" aria-live="polite"></section>
+    </div>
+  </main>
+
+  <section class="faq" id="faq" aria-labelledby="faq-title"><h2 id="faq-title">Frequently asked</h2><details><summary>How do I use a guide?</summary><p>Search for an issue, choose a location or category tag, then open the guide for the authority, evidence checklist and escalation steps.</p></details><details><summary>Can I report an emergency here?</summary><p>No. For immediate danger or a crime in progress, call 112 first. These pages explain non-emergency reporting routes.</p></details><details><summary>How are new guides added?</summary><p>Developers add a structured article to <code>data/articles.json</code>, assign tags from <code>data/tags.json</code>, then publish the update.</p></details></section>
+  <footer class="footer"><span>© <span id="copyright-year"></span> Citizen One · Views expressed are personal.</span><span>Designed, Ideated, and Ran by Raj Tandel.</span><span><a href="/">Guides</a> · <a href="/about">About</a> · <a href="#faq">FAQ</a> · <a href="/privacy">Privacy</a> · <a href="/admin">Admin</a> · <a href="/sitemap.xml">Sitemap</a></span></footer>
+</div>
+
+<a class="floating-contact" id="floating-contact" href="mailto:?subject=Citizen%20One%20feedback" aria-label="Contact Citizen One">Contact</a>
+<button class="to-top" id="to-top" type="button" aria-label="Go to top">↑</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Cookie settings"><div><strong>Privacy first.</strong> This site uses only essential local preferences unless you choose otherwise. <a href="/privacy">Read the privacy policy</a>.</div><div class="cookie-actions"><button type="button" id="cookie-dismiss">Only essential</button><button type="button" class="accept" id="cookie-accept">Accept</button></div></div>
+
+<script>
+const $ = selector => document.querySelector(selector);
+const search = $('#search'), clear = $('#clear'), cards = $('#cards'), empty = $('#empty');
+const homeView = $('#home-view'), browseView = $('#browse-view'), detailView = $('#detail-view');
+const initialParams = new URLSearchParams(location.search);
+let allArticles = [], locations = [], categories = [], activeLocation = initialParams.get('location') || '', activeTopic = initialParams.get('topic') || '', updatedLabel = '';
+if (initialParams.get('q')) { search.value = initialParams.get('q'); clear.style.display = 'block'; }
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const tracked = value => { try { const url = new URL(value, location.origin); if (!/^https?:$/.test(url.protocol)) return value; url.searchParams.set('utm_source','citizen-one'); url.searchParams.set('utm_medium','knowledge-base'); url.searchParams.set('utm_campaign','guide'); return url.toString(); } catch { return value; } };
+function linkify(value, phones = false) { const tokens = []; const protect = html => { const token = `__C1_TOKEN_${tokens.length}__`; tokens.push(html); return token; }; let text = esc(value); text = text.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, email => protect(`<a href="mailto:${email}">${email}</a>`)); text = text.replace(/(?:https?:\/\/|www\.)[^\s<]+/gi, url => protect(`<a href="${esc(tracked(url.startsWith('www.') ? `https://${url}` : url))}" target="_blank" rel="noreferrer">${url}</a>`)); text = text.replace(/\b(?:[a-z0-9-]+\.)+(?:gov\.in|nic\.in|in|org|com)(?:\/[^\s<]*)?/gi, domain => protect(`<a href="${esc(tracked(`https://${domain}`))}" target="_blank" rel="noreferrer">${domain}</a>`)); if (phones) text = text.replace(/(?<![\w])(?:\+?\d[\d\s().-]{2,}\d|\d{3,5})(?![\w])/g, phone => protect(`<a class="privacy-value" href="tel:${phone.replace(/\D/g, '')}">${phone}</a>`)); return text.replace(/__C1_TOKEN_(\d+)__/g, (_, index) => tokens[Number(index)]); }
+function showToast(message) { const toast = $('#toast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove('show'), 2200); }
+
+function card(article) { const tags = (article.tags || []).slice(0, 3).map(tag => `<span class="tag">${esc(tag)}</span>`).join(''); const locationTags = (article.locationLabels || []).slice(0, 2).map(tag => `<span class="tag">${esc(tag)}</span>`).join(''); const categoryLabel = article.categoryLabels?.[0] || article.categoryLabel || 'Other guides'; return `<article class="card"><div class="card-top"><span class="pill ${article.status === 'draft' ? 'draft' : ''}">${esc(categoryLabel)}</span>${article.status === 'draft' ? '<span class="pill draft">Draft</span>' : ''}</div><h3>${esc(article.title)}</h3><p>${esc(article.summary)}</p><div class="card-bottom"><div class="tags">${locationTags}${tags}</div><a class="read" href="/guides/${encodeURIComponent(article.id)}">Read guide →</a></div></article>`; }
+function renderFilterGroup(element, items, activeValue, attribute, allLabel) { const total = allArticles.length; element.innerHTML = `<button class="category ${activeValue ? '' : 'active'}" data-${attribute}=""><span>${allLabel}</span><span class="count">${total}</span></button>` + items.map(item => `<button class="category ${activeValue === item.id ? 'active' : ''}" data-${attribute}="${esc(item.id)}"><span>${esc(item.label)}</span><span class="count">${item.count || 0}</span></button>`).join(''); element.querySelectorAll(`[data-${attribute}]`).forEach(button => button.addEventListener('click', () => { if (attribute === 'location') activeLocation = button.dataset.location; if (attribute === 'topic') activeTopic = button.dataset.topic; renderFilters(); runSearch(); })); }
+function renderFilters() { renderFilterGroup($('#locations'), locations, activeLocation, 'location', 'All locations'); renderFilterGroup($('#categories'), categories, activeTopic, 'topic', 'All categories'); }
+function renderResults(results) { const query = search.value.trim(); const activeLabel = activeTopic ? categories.find(category => category.id === activeTopic)?.label : activeLocation ? locations.find(location => location.id === activeLocation)?.label : ''; $('#results-title').textContent = query ? `Results for “${query}”` : (activeLabel || 'All guides'); $('#result-count').textContent = `${results.length} ${results.length === 1 ? 'guide' : 'guides'}`; cards.innerHTML = results.map(card).join(''); cards.style.display = results.length ? 'grid' : 'none'; empty.style.display = results.length ? 'none' : 'block'; }
+async function runSearch() { const params = new URLSearchParams(); if (search.value.trim()) params.set('q', search.value.trim()); if (activeLocation) params.set('location', activeLocation); if (activeTopic) params.set('topic', activeTopic); cards.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>'; cards.style.display = 'grid'; empty.style.display = 'none'; try { const response = await fetch(`/api/search?${params}`, { signal: AbortSignal.timeout(8000) }); if (!response.ok) throw new Error('Search failed'); const data = await response.json(); renderResults(data.results || []); } catch { cards.innerHTML = ''; cards.style.display = 'none'; empty.style.display = 'block'; empty.innerHTML = '<strong>Search is temporarily unavailable</strong>Please refresh and try again.'; $('#locations').innerHTML = '<div class="loading">Filters unavailable. Refresh to retry.</div>'; $('#categories').innerHTML = '<div class="loading">Filters unavailable. Refresh to retry.</div>'; showToast('Could not load search results'); } }
+function detailSection(section) { const channels = section.channels?.length ? `<div class="channels">${section.channels.map(channel => `<div class="channel"><strong>${esc(channel.name)}</strong><span class="privacy-value">${linkify(channel.contact, true)}</span>${channel.url ? `<a href="${esc(tracked(channel.url))}" target="_blank" rel="noreferrer">Open official link ↗</a>` : ''}<button type="button" class="copy-button" data-copy="${esc(channel.contact || '')}">Copy</button></div>`).join('')}</div>` : ''; const steps = section.steps?.length ? `<ol class="steps">${section.steps.map(step => `<li>${esc(step)}</li>`).join('')}</ol>` : ''; const checklist = section.checklist?.length ? `<ul class="checklist">${section.checklist.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : ''; return `<section class="detail-section"><h3>${esc(section.heading)}</h3>${section.body ? `<p>${linkify(section.body)}</p>` : ''}${channels}${steps}${checklist}</section>`; }
+function guideCopy(article) { return `${article.title}\n\n${article.summary}\n\n${(article.sections || []).map(section => `${section.heading}\n${section.body || ''}${section.channels ? `\n${section.channels.map(channel => `${channel.name}: ${channel.contact}`).join('\n')}` : ''}`).join('\n\n')}`; }
+function bindCopyButtons() { document.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => { try { await navigator.clipboard.writeText(button.dataset.copy); button.textContent = 'Copied'; showToast('Copied to clipboard'); setTimeout(() => button.textContent = 'Copy', 1400); } catch { showToast('Copy failed — select the text manually'); } })); }
+function openArticle(id) { const article = allArticles.find(item => item.id === id); if (!article) return; homeView.style.display = 'none'; document.querySelector('.side').style.display = 'none'; document.querySelector('.listing').style.display = 'none'; detailView.style.display = 'block'; const firstCategory = article.categoryLabels?.[0] || article.categoryLabel || 'Civic guide'; const locationsText = (article.locationLabels || []).join(' · '); detailView.innerHTML = `<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="#" id="detail-home">Guides</a><span>›</span><span>${esc(firstCategory)}</span><span>›</span><span>${esc(article.title)}</span></nav><div class="detail-head"><span class="pill ${article.status === 'draft' ? 'draft' : ''}">${esc(firstCategory)}${article.status === 'draft' ? ' · Draft' : ''}</span><h1>${esc(article.title)}</h1><p class="detail-summary">${esc(article.summary)}</p><p class="last-updated">Last updated ${esc(updatedLabel)}${locationsText ? ` · ${esc(locationsText)}` : ''}</p></div>${(article.sections || []).map(detailSection).join('')}<div class="detail-actions"><button type="button" class="copy-button" data-copy="${esc(guideCopy(article))}">Copy guide</button><button type="button" class="print-button" id="print-guide">Print guide</button></div><p class="back-link"><a href="#" id="detail-back">← Back to guides</a></p>`; $('#detail-home').addEventListener('click', event => { event.preventDefault(); closeArticle(); }); $('#detail-back').addEventListener('click', event => { event.preventDefault(); closeArticle(); }); $('#print-guide').addEventListener('click', () => window.print()); bindCopyButtons(); document.title = `${article.title} | Citizen One`; history.pushState({ article: id }, '', `#${encodeURIComponent(id)}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function closeArticle() { homeView.style.display = ''; document.querySelector('.side').style.display = ''; document.querySelector('.listing').style.display = ''; detailView.style.display = 'none'; document.title = 'Citizen One | Civic reporting guides'; if (location.hash) history.pushState({}, '', location.pathname + location.search); }
+function setTheme(theme) { document.documentElement.dataset.theme = theme; document.querySelectorAll('[data-theme-toggle]').forEach(button => button.setAttribute('aria-pressed', theme === 'dark')); try { localStorage.setItem('c1-theme', theme); } catch {} }
+function loadAnalytics() { const id = $('meta[name="ga-measurement-id"]')?.content; if (!id || window.gtag) return; const script = document.createElement('script'); script.async = true; script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`; document.head.appendChild(script); window.dataLayer = window.dataLayer || []; window.gtag = function(){ dataLayer.push(arguments); }; window.gtag('js', new Date()); window.gtag('config', id, { anonymize_ip: true }); }
+function initPreferences() { try { const theme = localStorage.getItem('c1-theme'); if (theme) setTheme(theme); const privacy = localStorage.getItem('c1-privacy') === '1'; document.body.classList.toggle('privacy-blur', privacy); const banner = $('#cookie-banner'); if (!localStorage.getItem('c1-cookie')) banner.classList.add('show'); else if (localStorage.getItem('c1-cookie') === 'accepted') loadAnalytics(); } catch { $('#cookie-banner').classList.add('show'); } }
+async function start() { cards.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>'; try { const response = await fetch('/api/kb', { signal: AbortSignal.timeout(8000) }); if (!response.ok) throw new Error('Load failed'); const data = await response.json(); allArticles = data.results || []; locations = data.locations || []; categories = data.categories || []; updatedLabel = data.updatedLabel || ''; renderFilters(); renderResults(allArticles); const articleId = decodeURIComponent(location.hash.slice(1)); if (articleId) openArticle(articleId); else if (activeLocation || activeTopic || search.value.trim()) runSearch(); } catch { cards.innerHTML = ''; cards.style.display = 'none'; empty.style.display = 'block'; empty.innerHTML = '<strong>Guides could not be loaded</strong>Please refresh the page or try again later.'; $('#locations').innerHTML = '<div class="loading">Filters unavailable. Refresh to retry.</div>'; $('#categories').innerHTML = '<div class="loading">Filters unavailable. Refresh to retry.</div>'; showToast('Could not load the guides'); } }
+
+let searchTimer; search.addEventListener('input', () => { clear.style.display = search.value ? 'block' : 'none'; clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 180); }); clear.addEventListener('click', () => { search.value = ''; clear.style.display = 'none'; runSearch(); search.focus(); });
+document.querySelectorAll('[data-theme-toggle]').forEach(button => button.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'))); document.querySelectorAll('[data-privacy-toggle]').forEach(button => button.addEventListener('click', () => { const enabled = !document.body.classList.contains('privacy-blur'); document.body.classList.toggle('privacy-blur', enabled); button.setAttribute('aria-pressed', enabled); try { localStorage.setItem('c1-privacy', enabled ? '1' : '0'); } catch {} showToast(enabled ? 'Privacy view on' : 'Privacy view off'); }));
+const menuToggle = $('.menu-toggle'), siteNav = $('#site-nav'); menuToggle.addEventListener('click', () => { const open = siteNav.classList.toggle('open'); menuToggle.setAttribute('aria-expanded', open); }); siteNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { siteNav.classList.remove('open'); menuToggle.setAttribute('aria-expanded', 'false'); }));
+$('#cookie-accept').addEventListener('click', () => { try { localStorage.setItem('c1-cookie', 'accepted'); } catch {} $('#cookie-banner').classList.remove('show'); loadAnalytics(); showToast('Preference saved'); }); $('#cookie-dismiss').addEventListener('click', () => { try { localStorage.setItem('c1-cookie', 'essential'); } catch {} $('#cookie-banner').classList.remove('show'); showToast('Only essential preferences enabled'); });
+const topButton = $('#to-top'); window.addEventListener('scroll', () => { const max = document.documentElement.scrollHeight - window.innerHeight; $('#scroll-progress').style.width = `${max > 0 ? (window.scrollY / max) * 100 : 0}%`; topButton.style.display = window.scrollY > 480 ? 'grid' : 'none'; }, { passive: true }); topButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' })); $('#copyright-year').textContent = new Date().getFullYear();
+document.addEventListener('click', event => { const link = event.target.closest('a[href]'); if (!link) return; const href = link.getAttribute('href'); if (!href || href.startsWith('#') || href.startsWith('/') || href.startsWith('mailto:') || href.startsWith('tel:')) return; link.href = tracked(href); }); window.addEventListener('popstate', () => { if (!location.hash) closeArticle(); }); initPreferences(); start();
+</script>
+</body>
+</html>

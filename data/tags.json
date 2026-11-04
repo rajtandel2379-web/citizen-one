@@ -1,0 +1,26 @@
+{
+  "locations": [
+    { "id": "mumbai", "label": "Location: Mumbai" },
+    { "id": "thane", "label": "Location: Thane" },
+    { "id": "pune-beta", "label": "Location: Pune (BETA)" }
+  ],
+  "categories": [
+    { "id": "food-drug", "label": "Food / Drug" },
+    { "id": "traffic", "label": "Traffic" },
+    { "id": "road-transportation", "label": "Road / Transportation" },
+    { "id": "medical-medicines", "label": "Medical / Medicines" },
+    { "id": "hospitals", "label": "Hospitals" },
+    { "id": "income-tax", "label": "Income Tax" },
+    { "id": "railways", "label": "Railways" },
+    { "id": "municipal-corporation", "label": "Municipal Corporation" },
+    { "id": "street-hawkers", "label": "Street hawkers" },
+    { "id": "illegal-street-establishment", "label": "Illegal Street establishment" },
+    { "id": "excess-space-shop-owners", "label": "Excess space used by shop owners / others" },
+    { "id": "unauthorised-space-vendors", "label": "Unauthorised space occupied by unlicensed vendors" },
+    { "id": "consumer-regulatory", "label": "Consumer Regulatory" },
+    { "id": "railways-grievances", "label": "Railways Grievances" },
+    { "id": "bribe-corruption", "label": "Bribe / corruption" },
+    { "id": "safety-rights", "label": "Safety & rights" },
+    { "id": "drafts", "label": "Sample blank articles" }
+  ]
+}

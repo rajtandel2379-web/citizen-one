@@ -1,0 +1,1343 @@
+{
+ "updated": "2026-11-04",
+ "thaneTrafficUnits": [
+  {
+   "unit": "Thane Nagar",
+   "whatsapp": "8655654171",
+   "areas": [
+    "thane station",
+    "thane nagar",
+    "thanenagar",
+    "jambli naka",
+    "court naka",
+    "tembhi naka",
+    "ram maruti"
+   ]
+  },
+  {
+   "unit": "Rabodi",
+   "whatsapp": "8655654172",
+   "areas": [
+    "rabodi",
+    "rabodi"
+   ]
+  },
+  {
+   "unit": "Naupada",
+   "whatsapp": "8655654173",
+   "areas": [
+    "naupada",
+    "charai",
+    "panchpakhadi",
+    "gokhale road",
+    "talao pali",
+    "talaopali",
+    "ghantali",
+    "vishnu nagar",
+    "bhaskar colony",
+    "tekdi bungalow",
+    "namdevwadi",
+    "hari om circle"
+   ]
+  },
+  {
+   "unit": "Kalwa",
+   "whatsapp": "8655654174",
+   "areas": [
+    "kalwa",
+    "kalva",
+    "vitawa",
+    "vitava"
+   ]
+  },
+  {
+   "unit": "Mumbra",
+   "whatsapp": "8655654175",
+   "areas": [
+    "mumbra",
+    "kausa",
+    "diva"
+   ]
+  },
+  {
+   "unit": "Kopri",
+   "whatsapp": "8655654176",
+   "areas": [
+    "kopri",
+    "kopari"
+   ]
+  },
+  {
+   "unit": "Wagle",
+   "whatsapp": "8655654177",
+   "areas": [
+    "wagle",
+    "wagale",
+    "wagle estate",
+    "shree nagar",
+    "shreenagar",
+    "road no 22",
+    "road no. 22"
+   ]
+  },
+  {
+   "unit": "Kapurbawdi",
+   "whatsapp": "8655654178",
+   "areas": [
+    "kapurbawdi",
+    "kapurbawadi",
+    "kapoorbawdi",
+    "majiwada",
+    "majiwade"
+   ]
+  },
+  {
+   "unit": "Vartaknagar (Wadwali)",
+   "whatsapp": "8655654179",
+   "areas": [
+    "vartak nagar",
+    "vartaknagar",
+    "lokmanya nagar",
+    "savarkar nagar",
+    "pokhran road no 1",
+    "pokhran road 1"
+   ]
+  },
+  {
+   "unit": "Bhiwandi",
+   "whatsapp": "8655654180",
+   "areas": [
+    "bhiwandi"
+   ]
+  },
+  {
+   "unit": "Kongaon",
+   "whatsapp": "8655654181",
+   "areas": [
+    "kongaon",
+    "konagaon"
+   ]
+  },
+  {
+   "unit": "Narpoli",
+   "whatsapp": "8655654182",
+   "areas": [
+    "narpoli"
+   ]
+  },
+  {
+   "unit": "Kalyan",
+   "whatsapp": "8655654183",
+   "areas": [
+    "kalyan"
+   ]
+  },
+  {
+   "unit": "Dombivli",
+   "whatsapp": "8655654184",
+   "areas": [
+    "dombivli",
+    "dombivali"
+   ]
+  },
+  {
+   "unit": "Kolsewadi",
+   "whatsapp": "8655654185",
+   "areas": [
+    "kolsewadi",
+    "kolshewadi"
+   ]
+  },
+  {
+   "unit": "Ulhasnagar",
+   "whatsapp": "8655654186",
+   "areas": [
+    "ulhasnagar"
+   ]
+  },
+  {
+   "unit": "Vitthalwadi",
+   "whatsapp": "8655654187",
+   "areas": [
+    "vitthalwadi"
+   ]
+  },
+  {
+   "unit": "Ambernath",
+   "whatsapp": "8655654188",
+   "areas": [
+    "ambernath",
+    "ambarnath",
+    "badlapur"
+   ]
+  }
+ ],
+ "entries": [
+  {
+   "id": "traffic-mumbai",
+   "title": "Traffic violation in Mumbai (no parking, no HSRP, triple seat, wrong side, helmet, etc.)",
+   "city": "mumbai",
+   "keywords": [
+    "no parking",
+    "parking",
+    "parked",
+    "challan",
+    "traffic",
+    "hsrp",
+    "number plate",
+    "fancy plate",
+    "helmet",
+    "triple seat",
+    "wrong side",
+    "signal",
+    "seat belt",
+    "tow",
+    "rash driving",
+    "tinted",
+    "double parking"
+   ],
+   "who": "Mumbai Traffic Police (Traffic Branch, Mumbai Police). Local traffic division/chowky handles action; HQ at Worli.",
+   "channels": [
+    {
+     "name": "Mumbai Traffic Police app",
+     "how": "Install the official app (Android/iOS), choose the violation (no parking, triple seat, no helmet, fancy/missing plate, wrong-side etc.), attach geo-tagged photo/video with vehicle number, submit. Verified offenders are issued an e-challan.",
+     "contact": "App: 'Mumbai Traffic Police' (MahaTraffic)"
+    },
+    {
+     "name": "Mumbai Traffic Police WhatsApp / helpline",
+     "how": "Send photo, location and vehicle number by WhatsApp/SMS/call. You get a complaint number to track.",
+     "contact": "8454 999 999"
+    },
+    {
+     "name": "Email (escalation / HQ)",
+     "how": "For follow-up when no action is taken.",
+     "contact": "multimediacell.traffic@mahapolice.gov.in, cp.mumbai.jtcp.traf@mahapolice.gov.in"
+    }
+   ],
+   "escalation": [
+    "Quote your complaint number on the helpline/WhatsApp again.",
+    "Email Traffic HQ (addresses above) with evidence and complaint number.",
+    "Visit Traffic HQ, Worli, in person.",
+    "State grievance portal Aaple Sarkar (grievances.maharashtra.gov.in) if still ignored."
+   ],
+   "evidence": "Clear photo showing vehicle number plate, the no-parking sign and surroundings, date/time and location. Do not post it on social media instead of sending it to the police.",
+   "sources": [
+    {
+     "t": "Free Press Journal: Mumbai Traffic Police helpline 8454999999 (call/WhatsApp/SMS)",
+     "u": "https://www.freepressjournal.in/mumbai/now-register-your-traffic-complaints-on-whatsapp"
+    },
+    {
+     "t": "Mumbai Traffic Police App (Apple App Store)",
+     "u": "https://apps.apple.com/app/id1450958843"
+    }
+   ]
+  },
+  {
+   "id": "traffic-thane",
+   "title": "Traffic violation in Thane / Thane Commissionerate (no parking, no HSRP, wrong side, triple seat, tinted glass, fancy plate, double parking)",
+   "city": "thane",
+   "keywords": [
+    "no parking",
+    "parking",
+    "parked",
+    "challan",
+    "traffic",
+    "hsrp",
+    "number plate",
+    "fancy plate",
+    "triple seat",
+    "wrong side",
+    "double parking",
+    "tinted",
+    "rickshaw",
+    "auto",
+    "helmet",
+    "signal"
+   ],
+   "who": "Thane City Traffic Branch (Thane Police Commissionerate). Each area belongs to a traffic unit; the unit's own WhatsApp number takes violation photos.",
+   "channels": [
+    {
+     "name": "Local traffic unit WhatsApp (area-wise)",
+     "how": "Send photo + exact location + vehicle number to the WhatsApp number of the traffic unit that covers the area (see unit table; the app resolves the unit from the place name).",
+     "contact": "See unit table"
+    },
+    {
+     "name": "Thane Traffic Control WhatsApp",
+     "how": "General traffic control WhatsApp; also used for autorickshaw complaints.",
+     "contact": "7039003866"
+    },
+    {
+     "name": "Thane Traffic helplines",
+     "how": "Call before contacting officers directly.",
+     "contact": "8286 300 300 / 8286 400 400"
+    },
+    {
+     "name": "Nirbhay Thane (official Thane Police AI WhatsApp chatbot)",
+     "how": "Save the number, send 'Hi', pick Traffic Services or Report a Crime.",
+     "contact": "+91 70394 55555"
+    }
+   ],
+   "escalation": [
+    "Email the unit's PI, e.g. Naupada: cp.thane.trnaupada@mahapolice.gov.in; other units follow cp.thane.tr<unit>@mahapolice.gov.in on the contact page.",
+    "ACP Traffic Thane / DCP Traffic: City Traffic Branch Office, Teen Hat Naka, Thane (W) 400602.",
+    "Traffic Control Room Thane: 022-25394876.",
+    "Aaple Sarkar (grievances.maharashtra.gov.in) if no reply."
+   ],
+   "evidence": "Photo with plate readable, location landmark, time. For several violations send separate photos.",
+   "sources": [
+    {
+     "t": "Saamana: Thane Police WhatsApp numbers per traffic unit",
+     "u": "https://www.saamana.com/thane-police-whatsapp-traffic-violation-helpline/"
+    },
+    {
+     "t": "Thane Traffic Police: contact us (helplines, unit emails)",
+     "u": "http://thanetrafficpolice.org/contact-us/"
+    },
+    {
+     "t": "Free Press Journal: Thane traffic WhatsApp 7039003866, helplines",
+     "u": "https://www.freepressjournal.in/mumbai/from-54-riders-to-helpline-numbers-thane-traffic-police-to-ensure-class-10-12-students-reach-board-exam-centres-on-time-full-details"
+    },
+    {
+     "t": "Nirbhay Thane (Thane Police official chatbot)",
+     "u": "https://nirbhaythane.org/"
+    }
+   ]
+  },
+  {
+   "id": "challan-dispute",
+   "title": "E-challan: pay, check or dispute a wrong challan; fake challan links",
+   "keywords": [
+    "challan",
+    "e-challan",
+    "echallan",
+    "fine",
+    "wrong challan",
+    "dispute",
+    "lok adalat",
+    "fake challan",
+    "parivahan",
+    "sold my vehicle"
+   ],
+   "who": "The traffic police that issued the challan; payment via Parivahan / MahaTraffic e-challan portal.",
+   "channels": [
+    {
+     "name": "Parivahan e-challan (national)",
+     "how": "Look up by vehicle/challan number, view photo, time and place.",
+     "contact": "echallan.parivahan.gov.in"
+    },
+    {
+     "name": "MahaTraffic e-challan (Maharashtra)",
+     "how": "View and pay Maharashtra traffic police challans; helpdesk for technical issues.",
+     "contact": "mahatrafficechallan.gov.in, helpdesk 8448448960"
+    },
+    {
+     "name": "Dispute",
+     "how": "Write to the issuing traffic unit/HQ with challan number, RC, DL, payment proof/sale papers and why it is wrong. Unpaid challans may go to a virtual Lok Adalat notice; attend or pay by the date.",
+     "contact": "Mumbai: 8454999999; Thane: 8286300300"
+    }
+   ],
+   "escalation": [
+    "Issuing unit's PI/ACP traffic",
+    "Traffic HQ (Mumbai: Worli; Thane: Teen Hat Naka)",
+    "Lok Adalat / court on the notice date"
+   ],
+   "warning": "Scam alert: fake 'RTO/Parivahan challan' WhatsApp links circulate. Open only the portals listed here by typing the address yourself; report scams on 1930 / cybercrime.gov.in.",
+   "sources": [
+    {
+     "t": "Parivahan e-challan portal",
+     "u": "https://echallan.parivahan.gov.in/"
+    },
+    {
+     "t": "Free Press Journal: fake challan link scam (Thane)",
+     "u": "https://www.freepressjournal.in/mumbai/thane-news-kalwa-man-recieves-fake-traffic-challan-fine-link-on-whatsapp-exposes-parivahan-link-scam"
+    }
+   ]
+  },
+  {
+   "id": "police-fir",
+   "title": "Police: filing an FIR, police refusing to register, misconduct",
+   "keywords": [
+    "fir",
+    "police",
+    "refuse",
+    "refusing",
+    "not registering",
+    "complaint to police",
+    "theft",
+    "stolen",
+    "assault",
+    "harassment",
+    "threat",
+    "zero fir",
+    "police station",
+    "misbehav",
+    "missing"
+   ],
+   "who": "Station House Officer of the police station; above that the Superintendent of Police (in Mumbai/Thane: the Deputy Commissioner of Police of the zone); then the magistrate.",
+   "channels": [
+    {
+     "name": "Emergency",
+     "how": "Immediate danger.",
+     "contact": "112 (also 100)"
+    },
+    {
+     "name": "Any police station (Zero FIR)",
+     "how": "Under Section 173 BNSS a cognizable offence must be registered at any police station irrespective of jurisdiction; you are entitled to a free copy of the FIR.",
+     "contact": "Nearest police station"
+    },
+    {
+     "name": "Nirbhay Thane (Thane city)",
+     "how": "WhatsApp chatbot to report incidents and get police services.",
+     "contact": "+91 70394 55555"
+    }
+   ],
+   "escalation": [
+    "If the SHO refuses: send the substance in writing (post) to the Superintendent of Police / DCP, Section 173(4) BNSS.",
+    "If still nothing: apply to the Judicial Magistrate under Section 175(3) BNSS with a copy of the SP application and an affidavit.",
+    "Constitutional remedy: writ petition in the High Court (Article 226).",
+    "Misconduct by police: complaint to DCP/Commissioner, and Aaple Sarkar grievance portal."
+   ],
+   "sources": [
+    {
+     "t": "Sansa Legal: FIR, Zero FIR and refusal remedies under BNSS",
+     "u": "https://www.sansalegal.com/post/how-to-file-fir-online-in-india-2026-e-fir-and-zero-fir-under-bnss-explained"
+    },
+    {
+     "t": "LiveLaw: Scope of Section 175(3) BNSS",
+     "u": "https://www.livelaw.in/articles/scope-of-challenge-order-section1753-bnss-540612"
+    },
+    {
+     "t": "Thane Police Commissionerate",
+     "u": "https://www.thanepolice.gov.in/"
+    }
+   ]
+  },
+  {
+   "id": "cyber",
+   "title": "Cyber fraud, UPI/online scam, harassment online",
+   "keywords": [
+    "cyber",
+    "upi",
+    "online fraud",
+    "scam",
+    "otp",
+    "phishing",
+    "hacked",
+    "fake call",
+    "digital arrest",
+    "money lost",
+    "sextortion",
+    "morphed",
+    "instagram",
+    "whatsapp fraud",
+    "loan app"
+   ],
+   "who": "National Cyber Crime Reporting Portal (MHA) with state cyber police; helpline 1930 for financial fraud.",
+   "channels": [
+    {
+     "name": "Helpline (do this first for money loss)",
+     "how": "Call immediately so the bank can freeze the transferred amount; speed matters.",
+     "contact": "1930"
+    },
+    {
+     "name": "National Cyber Crime Reporting Portal",
+     "how": "File the complaint with screenshots, transaction IDs, URLs, phone numbers.",
+     "contact": "cybercrime.gov.in"
+    }
+   ],
+   "escalation": [
+    "Also inform your bank in writing and ask for a dispute number.",
+    "If the bank does not reimburse within 30 days, RBI Ombudsman (cms.rbi.org.in).",
+    "Visit local police station / cyber police station with the acknowledgement."
+   ],
+   "sources": [
+    {
+     "t": "Free Press Journal: 1930 helpline and NCCRP",
+     "u": "https://www.freepressjournal.in/mumbai/fpj-cyber-secure-1930-helpline-the-first-weapon-against-cybercrime-in-maharashtra"
+    },
+    {
+     "t": "National Cyber Crime Reporting Portal",
+     "u": "https://cybercrime.gov.in"
+    }
+   ]
+  },
+  {
+   "id": "consumer",
+   "title": "Consumer complaint: defective product, refund, e-commerce, service deficiency, misleading ads",
+   "keywords": [
+    "consumer",
+    "refund",
+    "defective",
+    "product",
+    "warranty",
+    "e-commerce",
+    "amazon",
+    "flipkart",
+    "delivery",
+    "overcharg",
+    "mrp",
+    "misleading",
+    "service",
+    "builder delay",
+    "insurance",
+    "airline",
+    "refund not",
+    "cheated by shop",
+    "dark pattern",
+    "swiggy",
+    "zomato"
+   ],
+   "who": "Seller/company first; then National Consumer Helpline (mediation); then the Consumer Commission (District / State / National) under the Consumer Protection Act, 2019.",
+   "channels": [
+    {
+     "name": "National Consumer Helpline (NCH / INGRAM)",
+     "how": "Free pre-litigation mediation with the company. Call, WhatsApp or file online.",
+     "contact": "1915 / 1800-11-4000, WhatsApp 8800001915, consumerhelpline.gov.in, UMANG/INGRAM app"
+    },
+    {
+     "name": "Consumer Commission online filing",
+     "how": "File a formal complaint online (the older e-Daakhil portal has moved to e-Jagriti; use the portal the Department currently shows). Attach bills, warranty, chats, notices.",
+     "contact": "e-jagriti.gov.in (earlier edaakhil.nic.in)"
+    }
+   ],
+   "escalation": [
+    "1) Written complaint to seller/company grievance officer (keep email proof).",
+    "2) NCH 1915 / consumerhelpline.gov.in.",
+    "3) Legal notice, then District Commission (pecuniary limit commonly cited as up to ₹50 lakh; State ₹50 lakh–₹2 crore; National above ₹2 crore under the 2021 rules; verify current limits).",
+    "4) Appeal to State then National Commission.",
+    "Limitation: generally 2 years from the cause of action. Do NOT use consumer court for electricity supply disputes covered by the Electricity Act."
+   ],
+   "sources": [
+    {
+     "t": "National Consumer Helpline (INGRAM)",
+     "u": "https://consumerhelpline.gov.in/"
+    },
+    {
+     "t": "NCH 1915 walkthrough",
+     "u": "https://righttoinformation.wiki/nch-1915-consumer-helpline-india"
+    },
+    {
+     "t": "PTI/ThePrint: NCH upgraded",
+     "u": "https://theprint.in/economy/national-consumer-helpline-upgraded-to-simplify-filing-complaints-before-litigation/2190240/"
+    }
+   ]
+  },
+  {
+   "id": "electricity",
+   "title": "Electricity: power cut, wrong bill, meter issue (MSEDCL / Mahavitaran)",
+   "keywords": [
+    "electricity",
+    "power cut",
+    "light bill",
+    "electric bill",
+    "msedcl",
+    "mahavitaran",
+    "meter",
+    "transformer",
+    "no power",
+    "voltage",
+    "load shedding"
+   ],
+   "who": "MSEDCL (Mahavitaran) for most of Maharashtra incl. Thane suburbs outside Mumbai city; in Mumbai the supplier may be Adani Electricity, Tata Power or BEST — check your bill.",
+   "channels": [
+    {
+     "name": "MSEDCL 24x7 helplines",
+     "how": "Register the complaint, note the complaint number.",
+     "contact": "1912 / 19120 / 1800-212-3435 / 1800-233-3435"
+    }
+   ],
+   "escalation": [
+    "Level 1: helpline/ Section office.",
+    "Level 2: Internal Grievance Redressal Cell (IGRC) at the divisional office.",
+    "Level 3: Consumer Grievance Redressal Forum (CGRF) of your zone (Schedule A application) if IGRC rejects or 2 months pass.",
+    "Level 4: Electricity Ombudsman, MERC, Mumbai (Schedule B).",
+    "Non-compliance: MERC under Sections 142/146 Electricity Act."
+   ],
+   "sources": [
+    {
+     "t": "MSEDCL official: CGRF",
+     "u": "https://www.mahadiscom.in/consumer/consumer-grievances-redressal-forum"
+    },
+    {
+     "t": "MERC: grievance redressal mechanism",
+     "u": "https://merc.gov.in/?p=4175"
+    },
+    {
+     "t": "Free Press Journal: MSEDCL helplines",
+     "u": "https://www.freepressjournal.in/amp/mumbai/msedcl-urges-consumers-to-use-official-helplines-warns-against-directly-calling-field-engineers"
+    }
+   ]
+  },
+  {
+   "id": "bmc",
+   "title": "Mumbai civic issues: potholes, garbage, open manholes, water, drainage, illegal construction (BMC / MCGM)",
+   "city": "mumbai",
+   "keywords": [
+    "bmc",
+    "mcgm",
+    "pothole",
+    "garbage",
+    "manhole",
+    "drain",
+    "nullah",
+    "water supply",
+    "sewage",
+    "stray",
+    "illegal construction",
+    "footpath",
+    "tree",
+    "mosquito",
+    "hawker",
+    "road",
+    "civic",
+    "waterlogging",
+    "hawker",
+    "encroachment",
+    "encroach",
+    "stall",
+    "footpath blocked",
+    "illegal shop",
+    "unauthorised"
+   ],
+   "who": "Brihanmumbai Municipal Corporation (BMC) ward office (24 wards) under the Municipal Commissioner.",
+   "channels": [
+    {
+     "name": "BMC helpline",
+     "how": "IVR to operator, complaint registered on the portal.",
+     "contact": "1916"
+    },
+    {
+     "name": "MyBMC MARG app / portal",
+     "how": "Login with mobile OTP, choose category, attach geo-tagged photo, get a complaint number.",
+     "contact": "mcgm.gov.in, MyBMC MARG app"
+    },
+    {
+     "name": "BMC WhatsApp chatbot",
+     "how": "Share location and photo.",
+     "contact": "8999 228 999"
+    },
+    {
+     "name": "Open/damaged manhole WhatsApp chatbot",
+     "how": "Location plus photo.",
+     "contact": "9324 500 600"
+    },
+    {
+     "name": "Pothole Quick Fix app",
+     "how": "Report potholes with photo.",
+     "contact": "My Pothole Quick Fix app"
+    }
+   ],
+   "escalation": [
+    "Hawkers: complain to the ward office (License/Encroachment dept). Street vendors with a licence/survey registration are protected under the Street Vendors Act 2014 (Town Vending Committee), so ask whether the stall is in a notified no-hawking zone. Obstruction of the road can also go to the local police.",
+    "Ward office Assistant Commissioner (written complaint / email).",
+    "BMC Public Grievance cell.",
+    "Municipal Commissioner: mc@mcgm.gov.in.",
+    "Aaple Sarkar grievance portal (Urban Development appellate officer)."
+   ],
+   "sources": [
+    {
+     "t": "Free Press Journal: BMC grievance channels (1916, app, WhatsApp)",
+     "u": "https://www.freepressjournal.in/mumbai/mumbai-bmc-launches-maarg-system-to-streamline-citizen-complaints-improve-grievance-redressal-efficiency"
+    },
+    {
+     "t": "Free Press Journal: BMC manhole WhatsApp chatbot",
+     "u": "https://www.freepressjournal.in/mumbai/bmc-launches-whatsapp-chatbot-to-report-open-manholes-after-sakinaka-death"
+    }
+   ]
+  },
+  {
+   "id": "tmc",
+   "title": "Thane civic issues: potholes, garbage, water, drainage, air pollution, illegal construction (TMC)",
+   "city": "thane",
+   "keywords": [
+    "tmc",
+    "thane municipal",
+    "pothole",
+    "garbage",
+    "drain",
+    "water supply",
+    "sewage",
+    "stray",
+    "illegal construction",
+    "footpath",
+    "tree",
+    "pollution",
+    "dust",
+    "burning waste",
+    "road",
+    "civic",
+    "tmt",
+    "bus",
+    "hawker",
+    "encroachment",
+    "encroach",
+    "stall",
+    "footpath blocked",
+    "illegal shop",
+    "unauthorised"
+   ],
+   "who": "Thane Municipal Corporation (TMC), ward committee/ward office under the Municipal Commissioner.",
+   "channels": [
+    {
+     "name": "TMC citizen helpline",
+     "how": "Control room registers the complaint.",
+     "contact": "022-25331590 / 022-25331211"
+    },
+    {
+     "name": "TMC online grievance / DigiThane app",
+     "how": "Login on thanecity.gov.in, file complaint with ward and evidence, track by ID, reopen if unresolved.",
+     "contact": "thanecity.gov.in, DigiThane app"
+    },
+    {
+     "name": "TMC air-pollution WhatsApp",
+     "how": "Photo of open waste burning, construction dust, uncovered debris transport, etc.",
+     "contact": "8657 887 101"
+    },
+    {
+     "name": "TMT bus complaints",
+     "how": "Thane Municipal Transport helpline.",
+     "contact": "1800 229 901"
+    }
+   ],
+   "escalation": [
+    "Hawkers: complain to the ward office / Encroachment (Atikraman) dept via the helpline. Licensed street vendors are protected under the Street Vendors Act 2014; ask if the spot is a notified no-hawking zone. Road obstruction can also go to the local police.",
+    "Ward office / Assistant Commissioner.",
+    "Municipal Commissioner: mc@thanecity.gov.in, 022-25336523.",
+    "Aaple Sarkar grievance portal."
+   ],
+   "sources": [
+    {
+     "t": "Thane Police X post: TMC helpline & email",
+     "u": "https://x.com/ThaneCityPolice/status/1051458807245746176"
+    },
+    {
+     "t": "Mumbai Live: TMC air-pollution WhatsApp helpline",
+     "u": "https://www.mumbailive.com/en/environment/thane-municipal-corporation-launches-helpline-for-registering-air-pollution-complaints-81803"
+    },
+    {
+     "t": "Complaint Hub: TMC complaints & escalation",
+     "u": "https://complainthub.org/tmc-thane-help/"
+    }
+   ]
+  },
+  {
+   "id": "rti",
+   "title": "Right to Information (RTI): get information or documents from a public authority",
+   "keywords": [
+    "rti",
+    "right to information",
+    "information",
+    "documents from government",
+    "file noting",
+    "pio",
+    "first appeal",
+    "second appeal",
+    "information commission",
+    "no reply to rti"
+   ],
+   "who": "Public Information Officer (PIO) of the department; First Appellate Authority; then State/Central Information Commission.",
+   "channels": [
+    {
+     "name": "Maharashtra online RTI",
+     "how": "Online filing works for Maharashtra government (Mantralaya) departments only; field offices and local bodies need a written application.",
+     "contact": "rtionline.maharashtra.gov.in"
+    },
+    {
+     "name": "Central government RTI",
+     "how": "Online application and first appeal for central public authorities.",
+     "contact": "rtionline.gov.in"
+    }
+   ],
+   "escalation": [
+    "Application: fee ₹10 (Maharashtra), reply due in 30 days (48 hours if life/liberty).",
+    "First appeal to the First Appellate Authority within 30 days of reply/deadline.",
+    "Second appeal to the State Information Commission (sic.maharashtra.gov.in) or CIC (cic.gov.in) within 90 days.",
+    "Maharashtra SIC online second appeal: sic.maharashtra.gov.in/siconline."
+   ],
+   "sources": [
+    {
+     "t": "Thane NIC: Online RTI (Maharashtra)",
+     "u": "https://thane.nic.in/service/online-rti/"
+    },
+    {
+     "t": "RTI Wiki: Maharashtra RTI guide",
+     "u": "https://righttoinformation.wiki/states/maharashtra"
+    },
+    {
+     "t": "RTI Online (Govt of India)",
+     "u": "https://rtionline.gov.in"
+    }
+   ]
+  },
+  {
+   "id": "state-grievance",
+   "title": "Complaint against any Maharashtra government office or delayed government service (Aaple Sarkar, RTS, CM helpline, CPGRAMS)",
+   "keywords": [
+    "government office",
+    "delay",
+    "certificate",
+    "ration",
+    "revenue",
+    "talathi",
+    "tehsil",
+    "corruption",
+    "officer",
+    "service not provided",
+    "aaple sarkar",
+    "rts",
+    "cpgrams",
+    "caste certificate",
+    "income certificate",
+    "domicile",
+    "7/12",
+    "mutation"
+   ],
+   "who": "The department's grievance/appellate officers; Maharashtra State Commission for Right to Service; for central bodies CPGRAMS.",
+   "channels": [
+    {
+     "name": "Aaple Sarkar grievance portal + CM helpline",
+     "how": "Post a grievance, get a token, track; reopen to reach appellate officers.",
+     "contact": "grievances.maharashtra.gov.in, 1800-120-8040"
+    },
+    {
+     "name": "Aaple Sarkar RTS portal",
+     "how": "Apply for notified services within fixed time limits; appeal if missed.",
+     "contact": "aaplesarkar.mahaonline.gov.in"
+    },
+    {
+     "name": "CPGRAMS (central govt)",
+     "how": "Grievances against central ministries (incl. Railways, banks' public sector arms).",
+     "contact": "pgportal.gov.in"
+    }
+   ],
+   "escalation": [
+    "RTS Act: First appeal, second appeal, then third appeal to the State Commission for Right to Service within 60 days of the second order; officer penalty up to ₹5,000 per case.",
+    "Grievance portal: first appeal officer, second appeal officer (divisional commissioner/HOD), then CMO."
+   ],
+   "sources": [
+    {
+     "t": "Anantam: Aaple Sarkar and RTS appeals",
+     "u": "https://anantamias.com/aaple-sarkar/"
+    },
+    {
+     "t": "Complaint Hub: Aaple Sarkar grievance levels",
+     "u": "https://citizen.complainthub.org/t/how-can-i-file-complaints-about-government-offices-to-maharashtra-cmo-public-grievance-system-aaple-sarkar/2026"
+    },
+    {
+     "t": "Divisional Commissioner Konkan: RTS Act",
+     "u": "https://divcomkonkan.gov.in/en/rts/"
+    }
+   ]
+  },
+  {
+   "id": "bank",
+   "title": "Bank / NBFC / UPI wallet complaint",
+   "keywords": [
+    "bank",
+    "atm",
+    "credit card",
+    "debit card",
+    "loan",
+    "emi",
+    "nbfc",
+    "unauthorised transaction",
+    "chargeback",
+    "cheque",
+    "account frozen",
+    "wallet",
+    "paytm",
+    "phonepe",
+    "recovery agent",
+    "insurance ombudsman"
+   ],
+   "who": "The bank's grievance officer first; then RBI Integrated Ombudsman.",
+   "channels": [
+    {
+     "name": "RBI Complaint Management System",
+     "how": "Complain to the bank/NBFC in writing first and wait 30 days (or rejection), then file free of cost online, by email or post.",
+     "contact": "cms.rbi.org.in, 14448, crpc@rbi.org.in"
+    }
+   ],
+   "escalation": [
+    "Branch → Principal Nodal Officer of the bank.",
+    "RBI Ombudsman after 30 days / rejection (time limit stated in the current Integrated Ombudsman Scheme; recent text says 90 days, older 1 year, verify).",
+    "Appeal against Ombudsman decision within 30 days to the Appellate Authority, RBI Mumbai.",
+    "Online fraud: also 1930 immediately."
+   ],
+   "sources": [
+    {
+     "t": "RBI Integrated Ombudsman Scheme 2026 (salient features)",
+     "u": "https://www.bandhan.bank.in/sites/default/files/2026-07/Annexure-Salient_features_of_the_Integrated_Ombudsman_Scheme_2026.pdf"
+    },
+    {
+     "t": "RBI CMS portal",
+     "u": "https://cms.rbi.org.in"
+    }
+   ]
+  },
+  {
+   "id": "sebi",
+   "title": "Stock broker, demat, mutual fund, listed company investor grievance",
+   "keywords": [
+    "sebi",
+    "broker",
+    "demat",
+    "mutual fund",
+    "shares",
+    "ipo",
+    "stock",
+    "investor",
+    "scores",
+    "smart odr",
+    "zerodha",
+    "upstox",
+    "dividend",
+    "unclaimed"
+   ],
+   "who": "The company/broker first; then SEBI SCORES; then SMART ODR; appeals to the Securities Appellate Tribunal.",
+   "channels": [
+    {
+     "name": "SEBI SCORES",
+     "how": "File with PAN; the complaint auto-routes to the entity; broker resolution clock is 21 days.",
+     "contact": "scores.sebi.gov.in"
+    },
+    {
+     "name": "SMART ODR (conciliation then arbitration)",
+     "how": "For unresolved disputes; filing it while a SCORES complaint is pending closes the SCORES complaint.",
+     "contact": "smartodr.in"
+    }
+   ],
+   "escalation": [
+    "Complain to the broker/company compliance officer.",
+    "SCORES; if unhappy request a review within 15 days of closure.",
+    "SMART ODR.",
+    "Securities Appellate Tribunal for SEBI orders."
+   ],
+   "sources": [
+    {
+     "t": "RTI Wiki: SCORES 2026 and SMART ODR",
+     "u": "https://righttoinformation.wiki/sebi-scores-investor-complaint-2026"
+    },
+    {
+     "t": "SMART ODR portal",
+     "u": "https://smartodr.in"
+    }
+   ]
+  },
+  {
+   "id": "election",
+   "title": "Voter ID, electoral roll, election-code violation, polling issues",
+   "keywords": [
+    "voter",
+    "election",
+    "epic",
+    "voter id",
+    "electoral roll",
+    "name missing",
+    "mcc",
+    "model code",
+    "booth",
+    "polling",
+    "cvigil",
+    "bag",
+    "bribe voters",
+    "form 6",
+    "form 8"
+   ],
+   "who": "Electoral Registration Officer / District Election Officer / Chief Electoral Officer, Maharashtra; Election Commission of India.",
+   "channels": [
+    {
+     "name": "Voter Helpline",
+     "how": "Queries, complaints, status of applications.",
+     "contact": "1950 (add STD code if needed)"
+    },
+    {
+     "name": "cVIGIL app",
+     "how": "Report model-code/expenditure violations with photo/video during an election period; target action within 100 minutes.",
+     "contact": "cVIGIL app"
+    },
+    {
+     "name": "Voter Helpline app / ECI grievance portal (NGSP)",
+     "how": "Roll corrections, complaints and tracking.",
+     "contact": "eci.gov.in"
+    }
+   ],
+   "escalation": [
+    "ERO/DEO → Chief Electoral Officer Maharashtra → Election Commission of India (NGSP follow-up)."
+   ],
+   "sources": [
+    {
+     "t": "Vikaspedia: ECI complaint redressal mechanism",
+     "u": "https://en.vikaspedia.in/e-governance/online-citizen-services/government-to-citizen-services-g2c/grievance-redressal-1/complaint-redressal-mechanism-of-election-commission-of-india"
+    },
+    {
+     "t": "Citizen Matters: voter helplines and apps",
+     "u": "https://citizenmatters.in/voter-helplines-mobile-apps-election-commission-10623"
+    }
+   ]
+  },
+  {
+   "id": "rera",
+   "title": "Builder / real-estate: delayed possession, refund, carpet-area, misleading promises (MahaRERA)",
+   "keywords": [
+    "builder",
+    "rera",
+    "possession",
+    "flat",
+    "real estate",
+    "redevelopment",
+    "carpet area",
+    "oc",
+    "occupancy certificate",
+    "promoter",
+    "booking cancel"
+   ],
+   "who": "Maharashtra Real Estate Regulatory Authority (MahaRERA) for registered projects.",
+   "channels": [
+    {
+     "name": "MahaRERA complaint",
+     "how": "Register on the portal, file the complaint against the promoter with documents, pay the prescribed fee (commonly cited ₹5,000; verify on portal), track by acknowledgement number.",
+     "contact": "maharera.maharashtra.gov.in"
+    }
+   ],
+   "escalation": [
+    "Legal notice to builder.",
+    "MahaRERA complaint / conciliation.",
+    "Appeal to Maharashtra Real Estate Appellate Tribunal.",
+    "Consumer Commission is also available for deficiency in service."
+   ],
+   "sources": [
+    {
+     "t": "MahaRERA",
+     "u": "https://maharera.maharashtra.gov.in"
+    },
+    {
+     "t": "EzyLegal: Guide to MahaRERA complaint",
+     "u": "https://ezylegal.in/blogs/guide-to-rera-maharashtra-maharera"
+    }
+   ]
+  },
+  {
+   "id": "railway",
+   "title": "Railway complaints: train, station, food, cleanliness, staff",
+   "keywords": [
+    "railway",
+    "train",
+    "irctc",
+    "station",
+    "local train",
+    "coach",
+    "ticket refund",
+    "tte",
+    "railmadad",
+    "catering",
+    "platform"
+   ],
+   "who": "Indian Railways via RailMadad; zonal Railway Public Grievance cell.",
+   "channels": [
+    {
+     "name": "RailMadad",
+     "how": "Give PNR/journey details; complaints from any channel are logged here.",
+     "contact": "139, railmadad.indianrailways.gov.in, RailMadad app, SMS 'MADAD <complaint>' to 139"
+    }
+   ],
+   "escalation": [
+    "Zonal Railway PG cell (Central / Western Railway for Mumbai-Thane).",
+    "CPGRAMS pgportal.gov.in (Ministry of Railways).",
+    "Consumer Commission for loss/deficiency."
+   ],
+   "sources": [
+    {
+     "t": "Railways: unified helpline 139 and RailMadad",
+     "u": "https://scroll.in/announcements/948464/scroll_in"
+    },
+    {
+     "t": "Complaint Hub: Indian Railways escalation",
+     "u": "https://citizen.complainthub.org/t/indian-railways-official-grievance-redressal-escalation-protocol/30022"
+    }
+   ]
+  },
+  {
+   "id": "telecom",
+   "title": "Mobile / broadband / DTH complaint, spam calls, billing",
+   "keywords": [
+    "mobile",
+    "sim",
+    "airtel",
+    "jio",
+    "vi",
+    "bsnl",
+    "broadband",
+    "network",
+    "recharge",
+    "spam call",
+    "billing",
+    "port",
+    "telecom",
+    "dth"
+   ],
+   "who": "Your service provider's two-tier grievance mechanism (TRAI rules); then DoT Public Grievance cell.",
+   "channels": [
+    {
+     "name": "Provider complaint centre, then appellate authority",
+     "how": "Get a docket number; the provider must resolve within the TRAI time limits.",
+     "contact": "Provider app / 198 style care numbers"
+    },
+    {
+     "name": "DoT Public Grievance cell",
+     "how": "Escalate with proof the provider failed.",
+     "contact": "1063 (toll free), 011-23221166, pgportal.gov.in"
+    }
+   ],
+   "escalation": [
+    "Provider complaint centre → Appellate Authority → DoT PG cell / CPGRAMS → Consumer Commission."
+   ],
+   "sources": [
+    {
+     "t": "DoT: grievance redressal in telecom",
+     "u": "https://dot.gov.in/node/6341"
+    }
+   ]
+  },
+  {
+   "id": "emergency",
+   "title": "Emergency and safety helplines",
+   "keywords": [
+    "emergency",
+    "ambulance",
+    "fire",
+    "women safety",
+    "child",
+    "senior citizen",
+    "accident",
+    "help me",
+    "danger",
+    "rape",
+    "domestic violence"
+   ],
+   "who": "112 is the unified emergency number.",
+   "channels": [
+    {
+     "name": "Emergency numbers",
+     "how": "112 all emergencies; 100 police; 108 ambulance; 101 fire; 1091 women helpline; 1098 child helpline; 14567 senior citizens; 1930 cyber fraud.",
+     "contact": "112"
+    }
+   ],
+   "escalation": [],
+   "sources": [
+    {
+     "t": "Nagpur Rural Police: emergency list",
+     "u": "https://www.nagpurgraminpolice.gov.in/en/maharashtra_right_to_service_act"
+    }
+   ]
+  },
+  {
+   "id": "rights",
+   "title": "Your rights as a citizen of India",
+   "keywords": [
+    "rights",
+    "my rights",
+    "constitution",
+    "article",
+    "fundamental",
+    "arrest",
+    "detain",
+    "search",
+    "freedom",
+    "equality",
+    "protest",
+    "free legal aid",
+    "dlsa",
+    "legal aid",
+    "what can police do"
+   ],
+   "who": "Enforceable through courts (Article 32 Supreme Court, Article 226 High Court) and statutory bodies.",
+   "channels": [
+    {
+     "name": "Free legal aid",
+     "how": "Free legal services via the District Legal Services Authority / NALSA for eligible persons (women, children, SC/ST, persons in custody, low income).",
+     "contact": "NALSA helpline 15100, nalsa.gov.in"
+    }
+   ],
+   "rightsList": [
+    "Article 14: equality before law; Article 15: no discrimination; Article 16: equal opportunity in public jobs.",
+    "Article 19: speech, peaceful assembly, association, movement, profession (reasonable restrictions apply).",
+    "Article 21: life and personal liberty; includes privacy, dignity, speedy trial, clean environment. Article 21A: education 6-14.",
+    "Article 22: on arrest you must be told the grounds, can consult a lawyer, and must be produced before a magistrate within 24 hours.",
+    "Article 32 / 226: move the Supreme Court / High Court for enforcement of rights. Article 300A: property cannot be taken without law.",
+    "RTI Act 2005: right to information. Consumer Protection Act 2019: six consumer rights. Maharashtra Right to Public Services Act 2015: services within a time limit.",
+    "BNSS: free FIR copy, Zero FIR, arrest memo and right to inform a relative; women cannot ordinarily be arrested after sunset and before sunrise without magistrate order."
+   ],
+   "escalation": [],
+   "sources": [
+    {
+     "t": "Constitution of India (Legislative Department)",
+     "u": "https://legislative.gov.in/constitution-of-india/"
+    },
+    {
+     "t": "NALSA",
+     "u": "https://nalsa.gov.in"
+    }
+   ]
+  },
+  {
+   "id": "food-safety",
+   "title": "Unsafe or contaminated food: rat/insect/hair in food, stale or expired food, food poisoning, adulteration",
+   "keywords": [
+    "food",
+    "rat",
+    "cockroach",
+    "insect",
+    "lizard",
+    "worm",
+    "hair in",
+    "stale",
+    "expired",
+    "adulterated",
+    "adulteration",
+    "food poisoning",
+    "restaurant",
+    "hotel food",
+    "canteen",
+    "sweet shop",
+    "bakery",
+    "mithai",
+    "dabba",
+    "hygiene",
+    "unhygienic"
+   ],
+   "who": "FSSAI sets the rules; the state Food Safety Officers (Maharashtra FDA) inspect, sample and prosecute. For delivery apps, the platform and the restaurant are also answerable.",
+   "channels": [
+    {
+     "name": "FSSAI grievance portal",
+     "how": "Register the complaint with photos, bill, place and date (the Food Safety Connect app exists but is reported to be unreliable, so use the portal).",
+     "contact": "foodregulatory.fssai.gov.in/grievance-redressal"
+    },
+    {
+     "name": "Maharashtra FDA (Food & Drug Administration)",
+     "how": "Complain to the FDA for the district: the Food Safety Officer can inspect and seal the premises. Online complaint portal plus district offices.",
+     "contact": "fda.maharashtra.gov.in"
+    },
+    {
+     "name": "Compensation / refund",
+     "how": "Complain to the restaurant or app first (keep chat/email), then National Consumer Helpline.",
+     "contact": "1915, consumerhelpline.gov.in"
+    }
+   ],
+   "evidence": "Do not discard the food: photograph/video it with the bill, packaging and the premises, and keep a sealed sample if safe. If anyone fell ill, get medical care first and keep prescriptions and bills.",
+   "escalation": [
+    "Restaurant / delivery app written complaint.",
+    "FSSAI portal and Maharashtra FDA.",
+    "NCH 1915, then District Consumer Commission for compensation (illness, medical costs).",
+    "Serious harm: also inform the local police (negligence is a criminal offence)."
+   ],
+   "sources": [
+    {
+     "t": "FSSAI: consumer grievance redressal",
+     "u": "https://foodregulatory.fssai.gov.in/grievance-redressal"
+    },
+    {
+     "t": "Restaurant India: food hygiene complaints on Maharashtra FDA portal",
+     "u": "https://www.restaurantindia.in/news/pune-reports-highest-number-of-food-hygiene-complaints-on-maharashtra-fda-portal.n16764"
+    }
+   ]
+  },
+  {
+   "id": "corruption",
+   "title": "Bribe demanded by a government employee or police officer (Maharashtra)",
+   "keywords": [
+    "bribe",
+    "bribery",
+    "corrupt",
+    "corruption",
+    "demanded money",
+    "asking money",
+    "asking for money",
+    "asked for money",
+    "kickback",
+    "lanch",
+    "rishwat",
+    "lach",
+    "cut money",
+    "chai paani",
+    "under the table",
+    "bribe for"
+   ],
+   "who": "Anti-Corruption Bureau (ACB) Maharashtra investigates bribe demands by state government employees, including police and traffic police, in every district (Mumbai, Thane, Pune, etc.). Central government employees: CBI / CVC.",
+   "channels": [
+    {
+     "name": "ACB Maharashtra toll-free helpline",
+     "how": "Report the demand; the ACB can verify and lay a trap. Do not pay first.",
+     "contact": "1064"
+    },
+    {
+     "name": "ACB WhatsApp / website",
+     "how": "Send details of the officer, office, amount asked and date.",
+     "contact": "9930997700, acbmaharashtra.gov.in"
+    }
+   ],
+   "evidence": "Name/designation/badge or vehicle number of the officer, place, date and time, amount asked, any call recording or message. Complain before paying.",
+   "escalation": [
+    "For a traffic cop: also email the traffic HQ / DCP Traffic of that city with the same details.",
+    "ACB divisional office of your district.",
+    "Department vigilance cell / Lokayukta Maharashtra.",
+    "Central employees: CVC (cvc.gov.in) or CBI."
+   ],
+   "sources": [
+    {
+     "t": "Free Press Journal: ACB helpline 1064",
+     "u": "https://www.freepressjournal.in/mumbai/navi-mumbai-news-acb-launches-dedicated-helpline-for-citizens-to-report-bribe-demands-and-corruption"
+    },
+    {
+     "t": "ACB Maharashtra",
+     "u": "https://www.acbmaharashtra.gov.in"
+    }
+   ]
+  },
+  {
+   "id": "general",
+   "title": "Not sure who handles this? General routes that work for most complaints",
+   "keywords": [],
+   "who": "Pick the body that regulates or employs whoever caused the problem, and use its own grievance cell first.",
+   "channels": [
+    {
+     "name": "Danger or crime in progress",
+     "how": "Call first.",
+     "contact": "112"
+    },
+    {
+     "name": "Maharashtra government office or service",
+     "how": "Aaple Sarkar grievance portal with a token; reopen to escalate.",
+     "contact": "grievances.maharashtra.gov.in, 1800-120-8040"
+    },
+    {
+     "name": "Central government body",
+     "how": "CPGRAMS grievance portal.",
+     "contact": "pgportal.gov.in"
+    },
+    {
+     "name": "Shop, company or service (refund, defect)",
+     "how": "National Consumer Helpline.",
+     "contact": "1915"
+    },
+    {
+     "name": "Bribe demanded",
+     "how": "Anti-Corruption Bureau Maharashtra.",
+     "contact": "1064"
+    },
+    {
+     "name": "Free legal help",
+     "how": "District Legal Services Authority / NALSA.",
+     "contact": "15100"
+    }
+   ],
+   "escalation": [],
+   "sources": [
+    {
+     "t": "Aaple Sarkar / CPGRAMS routes",
+     "u": "https://citizen.complainthub.org/t/how-can-i-file-complaints-about-government-offices-to-maharashtra-cmo-public-grievance-system-aaple-sarkar/2026"
+    }
+   ]
+  }
+ ]
+}

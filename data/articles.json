@@ -1,0 +1,664 @@
+[
+  {
+    "id": "traffic-road-issues",
+    "category": "traffic-road",
+    "categoryLabel": "Traffic / road issues",
+    "title": "No parking, no HSRP, double parking or rash driving",
+    "summary": "A clear, evidence-first route for reporting unsafe driving and traffic violations in Maharashtra.",
+    "locations": [
+      "mumbai",
+      "thane",
+      "pune-beta"
+    ],
+    "categories": [
+      "traffic",
+      "road-transportation"
+    ],
+    "tags": [
+      "no parking",
+      "no HSRP",
+      "double parking",
+      "rash driving",
+      "wrong side",
+      "helmet",
+      "traffic",
+      "road"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Send the complaint to the traffic police for the city where the incident happened. For Mumbai, use Mumbai Traffic Police. For Thane, use the area traffic unit or Thane Traffic Control. For Pune, use Pune Traffic Police. If someone is in immediate danger, call 112 first.",
+        "channels": [
+          {
+            "name": "Mumbai Traffic Police",
+            "contact": "Official Mumbai Traffic Police app / WhatsApp 8454 999 999"
+          },
+          {
+            "name": "Thane Traffic Police",
+            "contact": "Traffic Control WhatsApp 7039003866 · 8286 300 300 / 8286 400 400"
+          },
+          {
+            "name": "Maharashtra escalation",
+            "contact": "Aaple Sarkar · grievances.maharashtra.gov.in"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "Choose the official traffic channel, select the closest violation type, attach the evidence and submit the exact location. Ask for the complaint number and keep it for follow-up. Send separate reports when there are several unrelated violations.",
+        "steps": [
+          "Open the official traffic police app or city traffic WhatsApp channel.",
+          "Write what happened in one line: violation, road, landmark and direction of travel.",
+          "Attach the photo or video and vehicle number, if readable.",
+          "Save the acknowledgement or complaint number."
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "Capture a clear photo or short video showing the vehicle number plate, the violation and the surrounding landmark. Note the date, time and exact location. Do not put yourself in danger or confront the driver.",
+        "checklist": [
+          "Vehicle number",
+          "Date and time",
+          "Exact location / landmark",
+          "Photo or video",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Follow up using the complaint number, then contact the traffic unit or DCP Traffic for that city. If the complaint is still ignored, use the Maharashtra public grievance route and attach your earlier acknowledgement."
+      }
+    ]
+  },
+  {
+    "id": "hawkers-thane",
+    "category": "illegal-hawkers",
+    "categoryLabel": "Illegal hawkers: Thane",
+    "title": "Illegal hawkers or encroachment in Thane",
+    "summary": "Report blocked footpaths, roads and public spaces to the relevant Thane Municipal Corporation ward office with evidence.",
+    "locations": [
+      "thane"
+    ],
+    "categories": [
+      "municipal-corporation",
+      "street-hawkers",
+      "illegal-street-establishment",
+      "excess-space-shop-owners",
+      "unauthorised-space-vendors"
+    ],
+    "tags": [
+      "hawkers",
+      "illegal hawkers",
+      "encroachment",
+      "Thane",
+      "TMC",
+      "footpath",
+      "ward office"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Your respective Thane Municipal Corporation ward office or the TMC Encroachment (Atikraman) department. Road obstruction can also be reported to the local police.",
+        "channels": [
+          {
+            "name": "TMC citizen helpline",
+            "contact": "022-25331590 / 022-25331211"
+          },
+          {
+            "name": "TMC online grievance",
+            "contact": "thanecity.gov.in · DigiThane app"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "File a ward-level complaint with the exact spot, nearest landmark and what is being obstructed. Mention whether the issue affects pedestrians, traffic, an entrance, an emergency access route or a public footpath. Ask for a complaint number.",
+        "steps": [
+          "Identify the ward and exact location.",
+          "Attach dated photos or video from a safe place.",
+          "Submit to the ward office / TMC grievance channel.",
+          "Keep the acknowledgement and follow up with the Assistant Commissioner if needed."
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "Use wide and close photos showing the obstruction, road name, landmark and date/time. Avoid arguments with vendors; document the public obstruction instead.",
+        "checklist": [
+          "Exact address",
+          "Ward / area",
+          "Wide photo of obstruction",
+          "Close photo of the stall or structure",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Escalate from the ward office to the Assistant Commissioner, then the Municipal Commissioner. Attach the original complaint number and all evidence. Use Aaple Sarkar for a written escalation if the municipal route does not respond."
+      }
+    ]
+  },
+  {
+    "id": "hawkers-mumbai",
+    "category": "illegal-hawkers",
+    "categoryLabel": "Illegal hawkers: Mumbai",
+    "title": "Illegal hawkers or encroachment in Mumbai",
+    "summary": "Use the BMC ward office and its grievance channels to report blocked roads, footpaths and public spaces.",
+    "locations": [
+      "mumbai"
+    ],
+    "categories": [
+      "municipal-corporation",
+      "street-hawkers",
+      "illegal-street-establishment",
+      "excess-space-shop-owners",
+      "unauthorised-space-vendors"
+    ],
+    "tags": [
+      "hawkers",
+      "illegal hawkers",
+      "encroachment",
+      "Mumbai",
+      "BMC",
+      "footpath",
+      "ward office"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Your respective Brihanmumbai Municipal Corporation (BMC) ward office, especially the License / Encroachment department. A road obstruction can also go to the local police.",
+        "channels": [
+          {
+            "name": "BMC helpline",
+            "contact": "1916"
+          },
+          {
+            "name": "MyBMC MARG",
+            "contact": "mcgm.gov.in · MyBMC MARG app"
+          },
+          {
+            "name": "BMC WhatsApp chatbot",
+            "contact": "8999 228 999"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "Select the civic encroachment or obstruction category, pin the location, add evidence and describe the public access being blocked. Ask for the complaint number and keep the acknowledgement.",
+        "steps": [
+          "Identify the BMC ward and exact location.",
+          "Attach photos showing the public obstruction and surrounding landmark.",
+          "Submit through 1916 or the official BMC grievance channel.",
+          "Follow up with the ward office Assistant Commissioner using the complaint number."
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "Take a wide photo showing the road or footpath and a close photo showing the obstruction. Note date, time, ward and landmark. Do not confront anyone or put yourself at risk.",
+        "checklist": [
+          "Exact location",
+          "BMC ward",
+          "Photos or video",
+          "Date and time",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Escalate to the ward Assistant Commissioner, then the BMC Public Grievance Cell or Municipal Commissioner. Include the original complaint number and use Aaple Sarkar if the municipal route remains unresolved."
+      }
+    ]
+  },
+  {
+    "id": "hawkers-pune",
+    "category": "illegal-hawkers",
+    "categoryLabel": "Illegal hawkers: Pune",
+    "title": "Illegal hawkers or encroachment in Pune",
+    "summary": "Start with your Pune Municipal Corporation ward office and attach evidence that shows the obstruction and location.",
+    "locations": [
+      "pune-beta"
+    ],
+    "categories": [
+      "municipal-corporation",
+      "street-hawkers",
+      "illegal-street-establishment",
+      "excess-space-shop-owners",
+      "unauthorised-space-vendors"
+    ],
+    "tags": [
+      "hawkers",
+      "illegal hawkers",
+      "encroachment",
+      "Pune",
+      "PMC",
+      "footpath",
+      "ward office"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Your respective Pune Municipal Corporation ward office or the PMC Encroachment department. For an active road blockage or immediate safety risk, also inform the local police.",
+        "channels": [
+          {
+            "name": "Pune Municipal Corporation",
+            "contact": "Use the official PMC website / ward office grievance channel"
+          },
+          {
+            "name": "Maharashtra escalation",
+            "contact": "Aaple Sarkar · grievances.maharashtra.gov.in"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "State the ward, road, landmark and the public access being blocked. Upload clear evidence and request a complaint number so the report can be tracked.",
+        "steps": [
+          "Identify the PMC ward and exact spot.",
+          "Photograph the obstruction from a safe public place.",
+          "Submit to the PMC ward office or official grievance channel.",
+          "Follow up with the ward officer / Encroachment department using the acknowledgement."
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "Keep dated photos or video, exact location, nearby landmark and a short description of the obstruction. Do not argue with vendors or record people unnecessarily.",
+        "checklist": [
+          "Exact address",
+          "Ward / area",
+          "Wide and close photos",
+          "Date and time",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Escalate to the ward officer and PMC senior grievance officer. Attach proof of the first complaint. For a Maharashtra government escalation, use Aaple Sarkar."
+      }
+    ]
+  },
+  {
+    "id": "bribe-maharashtra",
+    "category": "corruption",
+    "categoryLabel": "Bribe / corruption",
+    "title": "A government employee asks for a bribe",
+    "summary": "Preserve the details and report a bribe demand to the Anti-Corruption Bureau Maharashtra before paying whenever possible.",
+    "locations": [
+      "mumbai",
+      "thane",
+      "pune-beta"
+    ],
+    "categories": [
+      "bribe-corruption"
+    ],
+    "tags": [
+      "bribe",
+      "corruption",
+      "ACB",
+      "rishwat",
+      "police bribe",
+      "Maharashtra",
+      "trap"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "The Anti-Corruption Bureau (ACB) Maharashtra and the local ACB office under the jurisdiction where the demand happened, such as ACB Thane, Mumbai or Pune. Central government employees may need a CVC / CBI route instead.",
+        "channels": [
+          {
+            "name": "ACB Maharashtra helpline",
+            "contact": "1064"
+          },
+          {
+            "name": "ACB Maharashtra",
+            "contact": "9930997700 · acbmaharashtra.gov.in"
+          }
+        ]
+      },
+      {
+        "heading": "What to do first",
+        "body": "Do not pay or promise money just to create evidence. Contact ACB for instructions; they may verify the demand and arrange lawful action. If there is an immediate threat, call 112.",
+        "steps": [
+          "Write down exactly what was demanded and by whom.",
+          "Contact ACB Maharashtra as soon as possible.",
+          "Follow the ACB officer's instructions about any recording or trap.",
+          "Keep the complaint acknowledgement and the name of the office handling it."
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "Capture or preserve evidence only when it is safe and lawful. Keep the officer's name, designation, badge or vehicle number, office, amount, date, time and location. Preserve messages, call details, documents and any recording without editing it.",
+        "checklist": [
+          "Officer name / designation",
+          "Date and time",
+          "Location",
+          "Amount demanded",
+          "Messages or recording",
+          "ACB complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Follow up with the ACB divisional office for the district. You can also write to the department vigilance cell or Lokayukta Maharashtra. Keep the original submission and all follow-up acknowledgements."
+      }
+    ]
+  },
+  {
+    "id": "food-issues-maharashtra",
+    "category": "food-safety",
+    "categoryLabel": "Food issues",
+    "title": "Unsafe, stale, adulterated or contaminated food",
+    "summary": "Report food safety problems in Maharashtra with the evidence the Food Safety Officer needs to inspect the business.",
+    "locations": [
+      "mumbai",
+      "thane",
+      "pune-beta"
+    ],
+    "categories": [
+      "food-drug"
+    ],
+    "tags": [
+      "food",
+      "food poisoning",
+      "stale food",
+      "expired",
+      "adulteration",
+      "restaurant",
+      "FDA",
+      "FSSAI"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Report to Maharashtra Food and Drug Administration (FDA) for the district where the food was sold. You can also use the FSSAI grievance route. For a refund or compensation, complain to the restaurant / delivery app and then the National Consumer Helpline.",
+        "channels": [
+          {
+            "name": "Maharashtra FDA",
+            "contact": "fda.maharashtra.gov.in"
+          },
+          {
+            "name": "FSSAI grievance portal",
+            "contact": "foodregulatory.fssai.gov.in/grievance-redressal"
+          },
+          {
+            "name": "National Consumer Helpline",
+            "contact": "1915 · consumerhelpline.gov.in"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "Describe the food, seller, date and location. Upload the bill, packaging and photos. Mention whether anyone became ill and whether the food is still available for inspection.",
+        "steps": [
+          "Complain to the restaurant or delivery app in writing and keep the ticket.",
+          "Submit the same evidence to Maharashtra FDA or FSSAI.",
+          "Keep the complaint number and any medical records.",
+          "Use the consumer route if you need a refund or compensation."
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "Do not discard the food if it is safe to preserve. Photograph or video the food, bill, packaging, label, premises and date. If anyone fell ill, seek medical care first and keep prescriptions and bills.",
+        "checklist": [
+          "Bill / order ID",
+          "Photos of food and packaging",
+          "Seller name and location",
+          "Date and time",
+          "Medical records if applicable",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "Helpline and email",
+        "body": "Keep this contact block editable as the FDA publishes updates. Add the current Maharashtra FDA district helpline and email here after verifying them on the official FDA website. Do not rely on an unverified number copied from social media."
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Follow up with the district Food Safety Officer and Maharashtra FDA using the acknowledgement. For illness, serious harm or compensation, also use the National Consumer Helpline and seek appropriate medical or legal help."
+      }
+    ]
+  },
+  {
+    "id": "sample-civic-issue",
+    "category": "drafts",
+    "categoryLabel": "Sample blank articles",
+    "title": "Civic issue article template",
+    "summary": "Copy this structure for a new issue: who handles it, where to report, evidence and escalation.",
+    "locations": [],
+    "categories": [
+      "drafts"
+    ],
+    "tags": [
+      "draft",
+      "template",
+      "new article",
+      "civic issue"
+    ],
+    "status": "draft",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Add the responsible authority, department, ward or office.",
+        "channels": [
+          {
+            "name": "Official channel",
+            "contact": "Website / phone / email / app"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "Explain the simplest reporting steps in plain language.",
+        "steps": [
+          "Add the first step",
+          "Add the second step",
+          "Add the third step"
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "List what a citizen should capture or save.",
+        "checklist": [
+          "Add evidence item",
+          "Add another evidence item",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Add the escalation path, expected follow-up and what to attach."
+      }
+    ]
+  },
+  {
+    "id": "sample-police-issue",
+    "category": "drafts",
+    "categoryLabel": "Sample blank articles",
+    "title": "Police / safety issue article template",
+    "summary": "A blank guide for issues that need a police station, emergency response or department escalation.",
+    "locations": [],
+    "categories": [
+      "drafts"
+    ],
+    "tags": [
+      "draft",
+      "template",
+      "police",
+      "safety"
+    ],
+    "status": "draft",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Add the correct police station, control room or emergency authority.",
+        "channels": [
+          {
+            "name": "Official channel",
+            "contact": "Website / phone / email / app"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "Explain what to say, what information to provide and how to get an acknowledgement.",
+        "steps": [
+          "Add the first step",
+          "Add the second step",
+          "Add the third step"
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "List safe and lawful evidence collection guidance.",
+        "checklist": [
+          "Add evidence item",
+          "Add another evidence item",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Add the next officer, supervisory channel and escalation route."
+      }
+    ]
+  },
+  {
+    "id": "sample-consumer-issue",
+    "category": "drafts",
+    "categoryLabel": "Sample blank articles",
+    "title": "Consumer / service issue article template",
+    "summary": "A blank guide for refunds, defective products, billing or poor service.",
+    "locations": [],
+    "categories": [
+      "drafts"
+    ],
+    "tags": [
+      "draft",
+      "template",
+      "consumer",
+      "refund",
+      "service"
+    ],
+    "status": "draft",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "Add the company grievance officer, regulator or consumer channel.",
+        "channels": [
+          {
+            "name": "Official channel",
+            "contact": "Website / phone / email / app"
+          }
+        ]
+      },
+      {
+        "heading": "How to report",
+        "body": "Explain the first written complaint and what reference number to request.",
+        "steps": [
+          "Add the first step",
+          "Add the second step",
+          "Add the third step"
+        ]
+      },
+      {
+        "heading": "Evidence to keep",
+        "body": "List bills, order IDs, terms, photographs and prior correspondence.",
+        "checklist": [
+          "Bill / order ID",
+          "Written correspondence",
+          "Complaint number"
+        ]
+      },
+      {
+        "heading": "If there is no response",
+        "body": "Add the regulator, consumer helpline or commission route and any deadline to verify."
+      }
+    ]
+  },
+  {
+    "id": "hello-world",
+    "category": "admin-guides",
+    "categoryLabel": "Admin guides",
+    "title": "hello world",
+    "summary": "India 3030",
+    "locations": [
+      "mumbai"
+    ],
+    "categories": [
+      "food-drug",
+      "traffic",
+      "road-transportation"
+    ],
+    "tags": [
+      "Traffic",
+      "Muncipal",
+      "India",
+      "Maharashrtra"
+    ],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "dddfd",
+        "html": "dddfd&nbsp;",
+        "channels": [],
+        "steps": [
+          "sd"
+        ],
+        "checklist": [
+          "dd"
+        ]
+      },
+      {
+        "heading": "New sectionddd",
+        "body": "ddd",
+        "html": "ddd",
+        "channels": [],
+        "steps": [
+          "ddd"
+        ],
+        "checklist": []
+      }
+    ]
+  },
+  {
+    "id": "vv",
+    "category": "admin-guides",
+    "categoryLabel": "Admin guides",
+    "title": "vv",
+    "summary": "vv",
+    "locations": [
+      "thane"
+    ],
+    "categories": [
+      "food-drug"
+    ],
+    "tags": [],
+    "status": "published",
+    "sections": [
+      {
+        "heading": "Report to",
+        "body": "",
+        "channels": [
+          {
+            "name": "vvv",
+            "contact": "vv",
+            "url": "vvv"
+          }
+        ],
+        "steps": [
+          "k",
+          "k",
+          "kk"
+        ],
+        "checklist": [
+          "k"
+        ]
+      }
+    ]
+  }
+]
