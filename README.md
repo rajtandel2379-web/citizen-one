@@ -20,7 +20,7 @@ Optional deployment settings are `SITE_URL` for canonical URLs and the sitemap, 
 
 Set a strong `ADMIN_PASSWORD` on the server, then open `/admin`. The admin page lets you create, edit, publish, draft or delete articles, assign locations and category tags, add sections, format text, create links, upload images, add official channels and maintain steps/checklists. Changes are written server-side and are immediately visible on the public guides after the next request; no source-file editing is required.
 
-Admin sessions are HttpOnly, SameSite cookies with a 12-hour lifetime. Rich text is sanitized on the server. Image uploads are limited to PNG, JPG, WebP or GIF files smaller than 5 MB. On writable hosts they are stored under `public/uploads`; on read-only serverless hosts they are embedded as validated image data URLs. Image URLs can also be added directly.
+Admin sessions are HttpOnly, SameSite cookies with a 12-hour lifetime. Rich text is sanitized on the server. Image uploads are limited to PNG, JPG, WebP or GIF files smaller than 5 MB. On writable hosts they are stored under `public/uploads`; on read-only serverless hosts they are embedded as validated image data URLs. Image URLs can also be added directly. If a serverless host also makes the article data read-only, admin changes use its writable runtime temp directory for the lifetime of that warm instance; use a database or object store for durable production publishing.
 
 For production, host this app on a service with persistent storage or move article/image persistence to a database/object store. Ephemeral filesystem deployments can lose admin changes during a redeploy or restart.
 

@@ -2,6 +2,7 @@
 // Content lives in data/articles.json so it can be edited and published without changing UI code.
 const http = require('http');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -19,17 +20,51 @@ const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || '';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const sessions = new Map();
 const SESSION_TTL = 12 * 60 * 60 * 1000;
+const runtimeScope = process.env.VERCEL_DEPLOYMENT_ID || process.env.VERCEL_GIT_COMMIT_SHA || 'local';
+const runtimeDataDir = process.env.CITIZEN_RUNTIME_DATA_DIR || path.join(os.tmpdir(), 'citizen-one-data', runtimeScope);
+const runtimeOverrides = new Map();
 
-function readJson(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+function isReadOnlyError(error) {
+  return ['EROFS', 'EACCES', 'EPERM'].includes(error?.code);
+}
+
+function runtimeFile(file) {
+  return path.join(runtimeDataDir, path.basename(file));
+}
+
+function readJson(file) {
+  const override = runtimeOverrides.get(file) || runtimeFile(file);
+  try {
+    return JSON.parse(fs.readFileSync(override, 'utf8'));
+  } catch (error) {
+    if (override !== file && error.code === 'ENOENT') return JSON.parse(fs.readFileSync(file, 'utf8'));
+    throw error;
+  }
+}
 
 function readAdminState() {
   try { return readJson(adminStatePath); } catch { return { deletedLegacy: [] }; }
 }
 
 function writeJsonAtomic(file, value) {
+  const contents = JSON.stringify(value, null, 2) + '\n';
   const temp = `${file}.${process.pid}.tmp`;
-  fs.writeFileSync(temp, JSON.stringify(value, null, 2) + '\n', 'utf8');
-  try { fs.renameSync(temp, file); } catch { fs.copyFileSync(temp, file); fs.unlinkSync(temp); }
+  try {
+    fs.writeFileSync(temp, contents, 'utf8');
+    try { fs.renameSync(temp, file); } catch { fs.copyFileSync(temp, file); fs.unlinkSync(temp); }
+    runtimeOverrides.delete(file);
+  } catch (error) {
+    if (!isReadOnlyError(error)) throw error;
+    // Vercel's deployed bundle is read-only. Keep admin changes available to
+    // warm function instances by writing to the runtime's writable temp dir.
+    fs.mkdirSync(runtimeDataDir, { recursive: true });
+    const fallback = runtimeFile(file);
+    const fallbackTemp = `${fallback}.${process.pid}.tmp`;
+    fs.writeFileSync(fallbackTemp, contents, 'utf8');
+    try { fs.renameSync(fallbackTemp, fallback); } catch { fs.copyFileSync(fallbackTemp, fallback); fs.unlinkSync(fallbackTemp); }
+    runtimeOverrides.set(file, fallback);
+    try { fs.unlinkSync(temp); } catch { /* the deployed filesystem may be read-only */ }
+  }
 }
 
 function bodyText(html) {
