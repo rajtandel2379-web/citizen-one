@@ -39,6 +39,9 @@ function bodyText(html) {
 function safeResourceUrl(value) {
   const raw = String(value || '').trim();
   if (!raw) return '';
+  // Serverless deployments may not have a writable public directory. Allow
+  // only image data URLs produced by the upload endpoint as an inline fallback.
+  if (/^data:image\/(?:png|jpeg|jpg|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(raw)) return raw;
   try {
     const url = new URL(raw, SITE_URL);
     return ['http:', 'https:', 'mailto:', 'tel:'].includes(url.protocol) ? raw : '';
@@ -421,11 +424,19 @@ async function handleAdmin(req, res, pathname) {
     if (!match) return send(res, 400, { error: 'Use a PNG, JPG, WebP or GIF image' });
     const buffer = Buffer.from(match[2], 'base64');
     if (!buffer.length || buffer.length > 5 * 1024 * 1024) return send(res, 413, { error: 'Image must be smaller than 5 MB' });
-    const extension = match[1].toLowerCase().replace('image/', '').replace('jpeg', 'jpg');
-    fs.mkdirSync(uploadsPath, { recursive: true });
+    const mime = match[1].toLowerCase().replace('image/jpg', 'image/jpeg');
+    const extension = mime.replace('image/', '').replace('jpeg', 'jpg');
     const filename = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${extension}`;
-    fs.writeFileSync(path.join(uploadsPath, filename), buffer);
-    return send(res, 201, { url: `/uploads/${filename}` });
+    try {
+      fs.mkdirSync(uploadsPath, { recursive: true });
+      fs.writeFileSync(path.join(uploadsPath, filename), buffer);
+      return send(res, 201, { url: `/uploads/${filename}`, storage: 'file' });
+    } catch (error) {
+      // Vercel and other serverless runtimes mount the deployed filesystem as
+      // read-only. Keep the upload usable by embedding it in the article HTML.
+      if (!['EROFS', 'EACCES', 'EPERM'].includes(error.code)) throw error;
+      return send(res, 201, { url: `data:${mime};base64,${buffer.toString('base64')}`, storage: 'inline' });
+    }
   }
   if (pathname === '/api/admin/articles' && req.method === 'GET') return send(res, 200, { articles: adminArticles(), locations: readJson(tagsPath).locations, categories: readJson(tagsPath).categories });
   if (pathname === '/api/admin/articles' && req.method === 'POST') {
@@ -483,7 +494,7 @@ function safePublicFile(urlPath) {
   return file.startsWith(PUBLIC + path.sep) ? file : null;
 }
 
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon' };
 
 const requestHandler = (req, res) => {
   let requestUrl;
