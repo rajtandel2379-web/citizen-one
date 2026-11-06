@@ -5,6 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
+const net = require('net');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC = path.join(__dirname, 'public');
@@ -12,6 +13,8 @@ const articlesPath = path.join(__dirname, 'data', 'articles.json');
 const legacyPath = path.join(__dirname, 'data', 'kb.json');
 const tagsPath = path.join(__dirname, 'data', 'tags.json');
 const adminStatePath = path.join(__dirname, 'data', 'admin-state.json');
+const usersPath = path.join(__dirname, 'data', 'users.json');
+const commentsPath = path.join(__dirname, 'data', 'comments.json');
 const uploadsPath = path.join(PUBLIC, 'uploads');
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'rajtandel2379@gmail.com';
@@ -19,7 +22,11 @@ const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID || '';
 const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || '';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const sessions = new Map();
+const userSessions = new Map();
+const authAttempts = new Map();
+const commentAttempts = new Map();
 const SESSION_TTL = 12 * 60 * 60 * 1000;
+const USER_SESSION_TTL = 30 * 24 * 60 * 60 * 1000;
 const runtimeScope = process.env.VERCEL_DEPLOYMENT_ID || process.env.VERCEL_GIT_COMMIT_SHA || 'local';
 const runtimeDataDir = process.env.CITIZEN_RUNTIME_DATA_DIR || path.join(os.tmpdir(), 'citizen-one-data', runtimeScope);
 const runtimeOverrides = new Map();
@@ -158,6 +165,189 @@ function currentAdmin(req) {
   const expires = token && sessions.get(token);
   if (!expires || expires < Date.now()) { if (token) sessions.delete(token); return false; }
   return true;
+}
+
+function requestIp(req) {
+  const vercelForwarded = String(req.headers['x-vercel-forwarded-for'] || '').split(',').map(value => value.trim()).filter(Boolean).at(-1);
+  const proxyHeaders = process.env.TRUST_PROXY === '1' ? [String(req.headers['x-forwarded-for'] || '').split(',').map(value => value.trim()).filter(Boolean).at(-1), req.headers['x-real-ip']] : [];
+  const candidates = [vercelForwarded, ...proxyHeaders, req.socket?.remoteAddress];
+  for (const candidate of candidates) {
+    const value = String(candidate || '').split(',')[0].trim().replace(/^\[|\]$/g, '');
+    if (net.isIP(value)) return value;
+  }
+  return 'unknown';
+}
+
+function currentUser(req) {
+  const token = parseCookies(req).c1_user;
+  const session = token && userSessions.get(token);
+  if (!session || session.expires < Date.now()) {
+    if (token) userSessions.delete(token);
+    return null;
+  }
+  return readUsers().find(user => user.id === session.userId) || null;
+}
+
+function readUsers() {
+  try { return readJson(usersPath); } catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+}
+
+function touchUser(user, req) {
+  if (!user) return;
+  const users = readUsers();
+  const stored = users.find(item => item.id === user.id);
+  if (!stored) return;
+  const now = new Date().toISOString();
+  const ip = requestIp(req);
+  stored.lastSeenAt = now;
+  stored.ips = Array.isArray(stored.ips) ? stored.ips : [];
+  let known = stored.ips.find(item => item.address === ip);
+  if (known) known.lastSeenAt = now;
+  else stored.ips.push({ address: ip, firstSeenAt: now, lastSeenAt: now });
+  stored.ips = stored.ips.slice(-30);
+  writeJsonAtomic(usersPath, users);
+}
+
+function recordActivity(userId, req, type, detail = '') {
+  if (!userId) return;
+  const users = readUsers();
+  const user = users.find(item => item.id === userId);
+  if (!user) return;
+  const now = new Date().toISOString();
+  const ip = requestIp(req);
+  user.activities = Array.isArray(user.activities) ? user.activities : [];
+  user.activities.push({ id: crypto.randomBytes(8).toString('hex'), type: String(type).slice(0, 40), detail: String(detail).trim().slice(0, 240), ip, at: now });
+  user.activities = user.activities.slice(-500);
+  user.lastSeenAt = now;
+  user.ips = Array.isArray(user.ips) ? user.ips : [];
+  const known = user.ips.find(item => item.address === ip);
+  if (known) known.lastSeenAt = now;
+  else user.ips.push({ address: ip, firstSeenAt: now, lastSeenAt: now });
+  user.ips = user.ips.slice(-30);
+  writeJsonAtomic(usersPath, users);
+}
+
+function allowAuthAttempt(req) {
+  const key = requestIp(req);
+  const now = Date.now();
+  const attempts = (authAttempts.get(key) || []).filter(value => now - value < 15 * 60 * 1000);
+  if (attempts.length >= 12) { authAttempts.set(key, attempts); return false; }
+  attempts.push(now);
+  authAttempts.set(key, attempts);
+  return true;
+}
+
+function accountCookie(token, req, maxAge = null) {
+  const secure = process.env.NODE_ENV === 'production' || req.socket?.encrypted || String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' ? '; Secure' : '';
+  return `c1_user=${token}; HttpOnly; SameSite=Strict; Path=/${maxAge === null ? '' : `; Max-Age=${maxAge}`}${secure}`;
+}
+
+function publicUser(user) {
+  return user ? { id: user.id, name: user.name } : null;
+}
+
+function readCommentStore() {
+  let stored;
+  try { stored = readJson(commentsPath); } catch (error) { if (error.code === 'ENOENT') return { items: [], lockedArticleIds: [] }; throw error; }
+  if (Array.isArray(stored)) return { items: stored, lockedArticleIds: [] };
+  return { items: Array.isArray(stored.items) ? stored.items : [], lockedArticleIds: Array.isArray(stored.lockedArticleIds) ? stored.lockedArticleIds : [] };
+}
+
+function accountSessionResponse(req, res, user, status = 200) {
+  const token = crypto.randomBytes(32).toString('hex');
+  userSessions.set(token, { userId: user.id, expires: Date.now() + USER_SESSION_TTL });
+  recordActivity(user.id, req, 'sign_in', 'Signed in');
+  return send(res, status, { ok: true, user: publicUser(user) }, 'application/json; charset=utf-8', { 'set-cookie': accountCookie(token, req) });
+}
+
+async function handleAccount(req, res, pathname) {
+  if (pathname === '/api/account/me' && req.method === 'GET') {
+    const user = currentUser(req);
+    if (user) touchUser(user, req);
+    return send(res, 200, { user: publicUser(user) });
+  }
+  if (pathname === '/api/account/register' && req.method === 'POST') {
+    if (!allowAuthAttempt(req)) return send(res, 429, { error: 'Too many attempts. Please try again later.' });
+    const input = await readRequestJson(req);
+    const name = String(input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+    const email = String(input.email || '').trim().toLowerCase().slice(0, 254);
+    const phone = String(input.phone || '').replace(/[^\d+]/g, '').slice(0, 20);
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (name.length < 2) return send(res, 400, { error: 'Enter your name.' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return send(res, 400, { error: 'Enter a valid email address.' });
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) return send(res, 400, { error: 'Enter a valid phone number.' });
+    if (input.termsAccepted !== true) return send(res, 400, { error: 'Please agree to the Terms and Conditions and Privacy Policy.' });
+    const users = readUsers();
+    if (users.some(user => user.email === email)) return send(res, 409, { error: 'An account already uses this email. Choose Log in and enter your registered details.' });
+    const now = new Date().toISOString();
+    const user = { id: crypto.randomBytes(12).toString('hex'), name, email, phone, createdAt: now, updatedAt: now, lastSeenAt: now, termsAcceptedAt: now, termsVersion: '2026-11-06', ips: [], activities: [] };
+    users.push(user);
+    writeJsonAtomic(usersPath, users);
+    return accountSessionResponse(req, res, user, 201);
+  }
+  if (pathname === '/api/account/login' && req.method === 'POST') {
+    if (!allowAuthAttempt(req)) return send(res, 429, { error: 'Too many attempts. Please try again later.' });
+    const input = await readRequestJson(req);
+    const name = String(input.name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    const email = String(input.email || '').trim().toLowerCase();
+    const phone = String(input.phone || '').replace(/[^\d+]/g, '');
+    const user = readUsers().find(item => item.name.toLowerCase() === name && item.email === email && item.phone === phone);
+    if (!user) return send(res, 401, { error: 'Those details did not match an account.' });
+    return accountSessionResponse(req, res, user);
+  }
+  if (pathname === '/api/account/logout' && req.method === 'POST') {
+    const token = parseCookies(req).c1_user;
+    const user = currentUser(req);
+    if (user) recordActivity(user.id, req, 'sign_out', 'Signed out');
+    if (token) userSessions.delete(token);
+    return send(res, 200, { ok: true }, 'application/json; charset=utf-8', { 'set-cookie': accountCookie('', req, 0) });
+  }
+  if (pathname === '/api/activity' && req.method === 'POST') {
+    const user = currentUser(req);
+    if (user) {
+      const input = await readRequestJson(req);
+      const type = ['page_view', 'guide_view', 'search'].includes(input.type) ? input.type : '';
+      if (type) recordActivity(user.id, req, type, String(input.detail || '').replace(/[<>]/g, '').slice(0, 240));
+    }
+    return send(res, 200, { ok: true });
+  }
+  return send(res, 404, { error: 'Account route not found' });
+}
+
+async function handleComments(req, res, pathname, requestUrl) {
+  if (pathname === '/api/comments' && req.method === 'GET') {
+    const articleId = String(requestUrl.searchParams.get('articleId') || '');
+    if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
+    const store = readCommentStore();
+    const user = currentUser(req);
+    if (user) touchUser(user, req);
+    const comments = store.items.filter(item => item.articleId === articleId).map(({ id, name, text, createdAt, updatedAt }) => ({ id, name, text, createdAt, updatedAt }));
+    return send(res, 200, { comments, locked: store.lockedArticleIds.includes(articleId), user: publicUser(user) });
+  }
+  if (pathname === '/api/comments' && req.method === 'POST') {
+    const input = await readRequestJson(req);
+    const articleId = String(input.articleId || '').slice(0, 100);
+    if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
+    const store = readCommentStore();
+    if (store.lockedArticleIds.includes(articleId)) return send(res, 403, { error: 'Comments are closed for this guide.' });
+    const ip = requestIp(req);
+    const attempts = (commentAttempts.get(ip) || []).filter(value => Date.now() - value < 60 * 60 * 1000);
+    if (attempts.length >= 8) { commentAttempts.set(ip, attempts); return send(res, 429, { error: 'Please wait before posting another comment.' }); }
+    const text = String(input.text || '').trim().slice(0, 2000);
+    const user = currentUser(req);
+    const name = String(user?.name || input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+    if (name.length < 2) return send(res, 400, { error: 'Enter a name to show with your comment.' });
+    if (text.length < 2) return send(res, 400, { error: 'Write a comment before posting.' });
+    attempts.push(Date.now());
+    commentAttempts.set(ip, attempts);
+    const now = new Date().toISOString();
+    const comment = { id: crypto.randomBytes(12).toString('hex'), articleId, userId: user?.id || null, name, text, ip, createdAt: now, updatedAt: now };
+    store.items.push(comment);
+    writeJsonAtomic(commentsPath, store);
+    if (user) recordActivity(user.id, req, 'comment', `Commented on ${findArticle(articleId)?.title || articleId}`);
+    return send(res, 201, { comment: { id: comment.id, name: comment.name, text: comment.text, createdAt: comment.createdAt, updatedAt: comment.updatedAt } });
+  }
+  return send(res, 405, { error: 'Method not allowed' });
 }
 
 function passwordMatches(candidate) {
@@ -367,14 +557,14 @@ function sharedScript() {
 
 function renderDocument({ title, description, canonical, body, status = 200 }) {
   const canonicalUrl = `${SITE_URL}${canonical}`;
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#17634a">${trackingMeta()}<style>${siteCss()}</style></head><body><a class="skip-link" href="#main-content">Skip to content</a><aside class="beta-notice" aria-label="Beta notice"><strong>BETA MODE</strong><span> · Citizen One is under development and is not yet final for public use.</span></aside><div class="shell"><header class="topbar"><a class="brand" href="/" aria-label="Citizen One home"><span class="brand-mark">C1</span><span>Citizen One</span></a><nav id="site-nav" class="site-nav" aria-label="Primary"><a href="/">Guides</a><a href="/about">About</a><a href="/#faq">FAQ</a><a href="/privacy">Privacy</a><a href="/admin">Admin</a><button type="button" data-theme-toggle aria-label="Toggle dark mode">◐</button><button type="button" data-privacy-toggle aria-label="Toggle privacy view">◉</button></nav><button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button></header><main id="main-content">${body}</main><footer class="footer"><span>© ${new Date().getFullYear()} Citizen One · Views expressed are personal.</span><span>Designed, Ideated, and Ran by Raj Tandel.</span><span><a href="/">Guides</a> · <a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/admin">Admin</a> · <a href="/sitemap.xml">Sitemap</a></span></footer></div><a class="floating-contact" href="${escapeHtml(contactHref())}" aria-label="Contact Citizen One">Contact</a>${sharedScript()}</body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}"><link rel="canonical" href="${escapeHtml(canonicalUrl)}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#17634a">${trackingMeta()}<style>${siteCss()}</style></head><body><a class="skip-link" href="#main-content">Skip to content</a><aside class="beta-notice" aria-label="Beta notice"><strong>BETA MODE</strong><span> · Citizen One is under development and is not yet final for public use.</span></aside><div class="shell"><header class="topbar"><a class="brand" href="/" aria-label="Citizen One home"><span class="brand-mark">C1</span><span>Citizen One</span></a><nav id="site-nav" class="site-nav" aria-label="Primary"><a href="/">Guides</a><a href="/about">About</a><a href="/#faq">FAQ</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/admin">Admin</a><button type="button" data-theme-toggle aria-label="Toggle dark mode">◐</button><button type="button" data-privacy-toggle aria-label="Toggle privacy view">◉</button></nav><button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button></header><main id="main-content">${body}</main><footer class="footer"><span>© ${new Date().getFullYear()} Citizen One · Views expressed are personal.</span><span>Designed, Ideated, and Ran by Raj Tandel.</span><span><a href="/">Guides</a> · <a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/admin">Admin</a> · <a href="/sitemap.xml">Sitemap</a></span></footer></div><a class="floating-contact" href="${escapeHtml(contactHref())}" aria-label="Contact Citizen One">Contact</a><script src="/account.js"></script>${sharedScript()}</body></html>`;
   return { status, html };
 }
 
 function renderGuidePage(article) {
   const firstCategory = article.categoryLabels?.[0] || article.categoryLabel || 'Civic guide';
   const locations = (article.locationLabels || []).join(' · ');
-  const body = `<div class="detail standalone-detail"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>${escapeHtml(firstCategory)}</span><span>›</span><span>${escapeHtml(article.title)}</span></nav><div class="detail-head"><span class="pill ${article.status === 'draft' ? 'draft' : ''}">${escapeHtml(firstCategory)}${article.status === 'draft' ? ' · Draft' : ''}</span><h1>${escapeHtml(article.title)}</h1><p class="detail-summary">${escapeHtml(article.summary)}</p><p class="last-updated">Last updated ${escapeHtml(articleDate())}${locations ? ` · ${escapeHtml(locations)}` : ''}</p></div>${renderGuideSections(article)}<div class="detail-actions"><button type="button" class="copy-button" data-copy="${escapeHtml(`${article.title}\n\n${article.summary}\n\n${(article.sections || []).map(s => `${s.heading}\n${s.body || ''}`).join('\n\n')}`)}">Copy guide</button><button type="button" class="print-button" onclick="window.print()">Print guide</button></div><p class="back-link"><a href="/">← Back to guides</a></p></div>`;
+  const body = `<div class="detail standalone-detail"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>${escapeHtml(firstCategory)}</span><span>›</span><span>${escapeHtml(article.title)}</span></nav><div class="detail-head"><span class="pill ${article.status === 'draft' ? 'draft' : ''}">${escapeHtml(firstCategory)}${article.status === 'draft' ? ' · Draft' : ''}</span><h1>${escapeHtml(article.title)}</h1><p class="detail-summary">${escapeHtml(article.summary)}</p><p class="last-updated">Last updated ${escapeHtml(articleDate())}${locations ? ` · ${escapeHtml(locations)}` : ''}</p></div>${renderGuideSections(article)}<div class="detail-actions"><button type="button" class="copy-button" data-copy="${escapeHtml(`${article.title}\n\n${article.summary}\n\n${(article.sections || []).map(s => `${s.heading}\n${s.body || ''}`).join('\n\n')}`)}">Copy guide</button><button type="button" class="print-button" onclick="window.print()">Print guide</button></div><section class="comments" data-comments-article="${escapeHtml(article.id)}" aria-label="Comments"><h2>Comments</h2><div data-comments-list><p class="loading">Loading comments…</p></div><form data-comment-form><label for="comment-text">Add a comment</label><textarea id="comment-text" name="text" maxlength="2000" required placeholder="Share a useful, respectful comment"></textarea><div class="comment-guest-name"><label for="comment-name">Name shown with your comment</label><input id="comment-name" name="name" maxlength="80" placeholder="Your name" required></div><button class="primary-link" type="submit">Post comment</button><p class="comment-note">Comments are public. Do not include private contact or sensitive information.</p></form></section><p class="back-link"><a href="/">← Back to guides</a></p></div>`;
   return renderDocument({ title: `${article.title} | Citizen One`, description: article.summary, canonical: `/guides/${encodeURIComponent(article.id)}`, body }).html;
 }
 
@@ -384,8 +574,13 @@ function renderAboutPage() {
 }
 
 function renderPrivacyPage() {
-  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Privacy</span></nav><h1>Privacy policy</h1><p class="detail-summary">Citizen One is designed to provide public reporting guidance without collecting personal complaint details.</p><section class="detail-section"><h2>What this site stores</h2><p>Your theme, cookie consent and privacy-view preferences may be stored locally in your browser. Search requests are sent to this site only to find matching articles. The site does not ask for Aadhaar, PAN, OTP, passwords or bank details.</p></section><section class="detail-section"><h2>Cookies and analytics</h2><p>This site uses a simple consent banner. Optional analytics should only be enabled after consent and only when an administrator adds a verified analytics ID. No analytics ID is bundled by default.</p></section><section class="detail-section"><h2>Contact</h2><p>For website feedback, use the Contact button if an administrator has configured a contact address for this deployment.</p></section></article>`;
-  return renderDocument({ title: 'Privacy policy | Citizen One', description: 'How Citizen One handles local preferences, search requests and optional analytics.', canonical: '/privacy', body }).html;
+  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Privacy</span></nav><p class="eyebrow">Last updated 6 November 2026</p><h1>Privacy policy</h1><p class="detail-summary">This notice explains what Citizen One collects when you browse as a guest, create an account, search, or post a comment, and what it is used for.</p><section class="detail-section"><h2>Who operates this site</h2><p>Citizen One is a civic information project created by Raj Tandel. For privacy questions or requests, contact <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>.</p></section><section class="detail-section"><h2>Information we collect</h2><ul class="checklist"><li><strong>Account:</strong> your name, email address, and phone number when you choose to register, plus the date and version of the Terms and Conditions you accept. Registration is optional for browsing.</li><li><strong>Session and activity:</strong> the IP address used to access an account, account sign-in and sign-out, pages or guides viewed, searches submitted, and comments posted. Activity entries include a date and time.</li><li><strong>Comments:</strong> the name shown with the comment, its text, the guide it appears on, and the IP address used to submit it. Comments and display names are public. Registered comments are linked to the account internally.</li><li><strong>Local preferences:</strong> theme, privacy display, cookie choice, and whether the account prompt has already been shown may be stored in your browser.</li><li><strong>Technical request data:</strong> the hosting service may process IP address, request time, and requested page to deliver and protect the site.</li></ul><p>Do not submit Aadhaar, PAN, OTPs, passwords, bank details, or sensitive personal information in a comment. This site does not request them.</p></section><section class="detail-section"><h2>Why we use it</h2><p>Account information enables the optional account sign-in experience. IP addresses and activity records help the administrator understand account access, maintain site security, and respond to abuse. Comments are displayed with the name you provide and can be edited, removed, or locked by the administrator. Local preferences remember your choices. Optional analytics load only after you accept them and only when an analytics ID is configured.</p></section><section class="detail-section"><h2>Accounts and sign-in</h2><p>The current account screen checks the same name, email, and phone number provided at registration. It does not send an email or SMS verification code. Anyone who knows all three details may be able to access that account, so keep them private and do not use the account to store sensitive information. You can continue as a guest instead.</p></section><section class="detail-section"><h2>Public comments</h2><p>Comments are visible to visitors. Do not include private information or anything you would not want published. Guests may comment using a display name; registered comments are linked to the account. The administrator can edit or delete comments and can close comments on any guide.</p></section><section class="detail-section"><h2>Sharing, storage, and retention</h2><p>Account, activity, and comment data is stored by the site and its hosting provider. We do not sell it or use it for advertising. The administrator can access account details, IP addresses, activity, and moderation records. Data may also be disclosed when required to protect the site, comply with law, or respond to a valid legal request. Account activity is limited to the most recent 500 events and the most recent 30 distinct IP addresses. Account and comment data is kept while needed to operate the service or moderate public discussions; deletion requests can be sent to the contact above. Deleting an account removes its account record and associated comments.</p></section><section class="detail-section"><h2>Your choices</h2><p>You can browse without registering, choose whether to enable optional analytics, and ask to access, correct, or delete your account information by emailing the contact above. You may also ask the administrator to remove a comment. The site may retain information that must be kept for security, moderation, or legal reasons.</p></section><section class="detail-section"><h2>Cookies and analytics</h2><p>Essential account sessions use a secure, HttpOnly cookie where HTTPS is available. Theme, privacy view, and cookie choices use browser storage. Optional Google Analytics is disabled unless this deployment configures it and you accept the analytics choice.</p></section><section class="detail-section"><h2>Changes</h2><p>We may update this notice when the site or its data practices change. The latest revision date appears above. Please review this page before creating an account or commenting.</p></section></article>`;
+  return renderDocument({ title: 'Privacy policy | Citizen One', description: 'What Citizen One collects for accounts, IP and activity records, comments, local preferences, and analytics.', canonical: '/privacy', body }).html;
+}
+
+function renderTermsPage() {
+  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Terms and Conditions</span></nav><p class="eyebrow">Last updated 6 November 2026</p><h1>Terms and Conditions</h1><p class="detail-summary">These terms apply when you use Citizen One, create an account, or post a comment.</p><section class="detail-section"><h2>Using Citizen One</h2><p>Citizen One provides general civic information and links to reporting channels. It is an independent project, not a government service, and does not submit complaints on your behalf. Guides are for general information, may be incomplete or out of date, and are not legal advice. Check important details with the responsible authority before acting. For immediate danger in India, contact emergency services at 112.</p></section><section class="detail-section"><h2>Accounts</h2><p>Registration is optional for browsing. Provide accurate name, email, and phone details if you create an account. The current sign-in checks those same three details and does not send a verification code. Keep them private; the account is not suitable for confidential or sensitive information. You may continue as a guest.</p></section><section class="detail-section"><h2>Comments</h2><p>Comments are public. Only post material you have the right to share. Do not post personal contact details, sensitive information, threats, harassment, unlawful content, spam, or content that violates another person’s rights. You remain responsible for what you submit. The administrator may edit or remove comments, restrict comment access, or lock comments on a guide.</p></section><section class="detail-section"><h2>Privacy and moderation</h2><p>By registering, you ask Citizen One to use your name, email, and phone to provide account access as described in the <a href="/privacy">Privacy Policy</a>. Account IP addresses and activity are recorded for account administration and site security. Comment names and text are publicly displayed; IP addresses are retained privately for moderation and security.</p></section><section class="detail-section"><h2>Availability and external sites</h2><p>The site and its content may change or become temporarily unavailable. Links to government and other external websites are provided for convenience; Citizen One does not control or guarantee their content, availability, or policies.</p></section><section class="detail-section"><h2>Contact</h2><p>Questions about these terms, an account, or a comment can be sent to <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>.</p></section></article>`;
+  return renderDocument({ title: 'Terms and Conditions | Citizen One', description: 'Terms for using Citizen One, creating an account, and posting public comments.', canonical: '/terms', body }).html;
 }
 
 function renderNotFound(pathname) {
@@ -394,7 +589,7 @@ function renderNotFound(pathname) {
 }
 
 function sitemapXml(articles) {
-  const urls = ['/', '/about', '/privacy', ...articles.map(article => `/guides/${encodeURIComponent(article.id)}`)];
+  const urls = ['/', '/about', '/privacy', '/terms', ...articles.map(article => `/guides/${encodeURIComponent(article.id)}`)];
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(url => `<url><loc>${escapeHtml(`${SITE_URL}${url}`)}</loc><lastmod>${escapeHtml(updatedDate())}</lastmod></url>`).join('')}</urlset>`;
 }
 
@@ -473,6 +668,59 @@ async function handleAdmin(req, res, pathname) {
       return send(res, 201, { url: `data:${mime};base64,${buffer.toString('base64')}`, storage: 'inline' });
     }
   }
+  if (pathname === '/api/admin/users' && req.method === 'GET') {
+    const users = readUsers().sort((a, b) => String(b.lastSeenAt || '').localeCompare(String(a.lastSeenAt || '')));
+    return send(res, 200, { users });
+  }
+  const userMatch = pathname.match(/^\/api\/admin\/users\/([^/]+)$/);
+  if (userMatch && req.method === 'DELETE') {
+    const id = decodeURIComponent(userMatch[1]);
+    const users = readUsers();
+    const nextUsers = users.filter(user => user.id !== id);
+    if (nextUsers.length === users.length) return send(res, 404, { error: 'User not found' });
+    writeJsonAtomic(usersPath, nextUsers);
+    const commentStore = readCommentStore();
+    commentStore.items = commentStore.items.filter(comment => comment.userId !== id);
+    writeJsonAtomic(commentsPath, commentStore);
+    for (const [token, session] of userSessions) if (session.userId === id) userSessions.delete(token);
+    return send(res, 200, { ok: true });
+  }
+  if (pathname === '/api/admin/comments' && req.method === 'GET') {
+    const store = readCommentStore();
+    const comments = store.items.map(comment => ({ ...comment, articleTitle: findArticle(comment.articleId)?.title || comment.articleId })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    return send(res, 200, { comments, lockedArticleIds: store.lockedArticleIds, articles: adminArticles().map(article => ({ id: article.id, title: article.title })) });
+  }
+  if (pathname === '/api/admin/comments/lock' && req.method === 'PUT') {
+    const input = await readRequestJson(req);
+    const articleId = String(input.articleId || '');
+    if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
+    const store = readCommentStore();
+    store.lockedArticleIds = store.lockedArticleIds.filter(id => id !== articleId);
+    if (input.locked === true) store.lockedArticleIds.push(articleId);
+    writeJsonAtomic(commentsPath, store);
+    return send(res, 200, { lockedArticleIds: store.lockedArticleIds });
+  }
+  const commentMatch = pathname.match(/^\/api\/admin\/comments\/([^/]+)$/);
+  if (commentMatch) {
+    const id = decodeURIComponent(commentMatch[1]);
+    const store = readCommentStore();
+    const index = store.items.findIndex(comment => comment.id === id);
+    if (index < 0) return send(res, 404, { error: 'Comment not found' });
+    if (req.method === 'PUT') {
+      const input = await readRequestJson(req);
+      const name = String(input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+      const text = String(input.text || '').trim().slice(0, 2000);
+      if (name.length < 2 || text.length < 2) return send(res, 400, { error: 'A name and comment text are required.' });
+      store.items[index] = { ...store.items[index], name, text, updatedAt: new Date().toISOString(), editedByAdmin: true };
+      writeJsonAtomic(commentsPath, store);
+      return send(res, 200, { comment: store.items[index] });
+    }
+    if (req.method === 'DELETE') {
+      store.items.splice(index, 1);
+      writeJsonAtomic(commentsPath, store);
+      return send(res, 200, { ok: true });
+    }
+  }
   if (pathname === '/api/admin/articles' && req.method === 'GET') return send(res, 200, { articles: adminArticles(), locations: readJson(tagsPath).locations, categories: readJson(tagsPath).categories });
   if (pathname === '/api/admin/articles' && req.method === 'POST') {
     const input = await readRequestJson(req);
@@ -542,8 +790,10 @@ const requestHandler = (req, res) => {
     return send(res, 200, sitemapXml(loadArticles()), 'application/xml; charset=utf-8');
   }
   if (req.method === 'GET' && pathname === '/privacy') {
-    const page = renderPrivacyPage();
-    return send(res, page.status || 200, page.html, 'text/html; charset=utf-8');
+    return send(res, 200, renderPrivacyPage(), 'text/html; charset=utf-8');
+  }
+  if (req.method === 'GET' && pathname === '/terms') {
+    return send(res, 200, renderTermsPage(), 'text/html; charset=utf-8');
   }
   if (req.method === 'GET' && pathname === '/about') {
     const page = renderAboutPage();
@@ -572,13 +822,27 @@ const requestHandler = (req, res) => {
   if (pathname.startsWith('/api/admin/')) {
     return handleAdmin(req, res, pathname).catch(error => { console.error('admin:', error); send(res, 400, { error: error.message || 'Admin request failed' }); });
   }
+  if (pathname.startsWith('/api/account/') || pathname === '/api/activity') {
+    return Promise.resolve(handleAccount(req, res, pathname)).catch(error => { console.error('account:', error); send(res, 400, { error: error.message || 'Account request failed' }); });
+  }
+  if (pathname === '/api/comments') {
+    return Promise.resolve(handleComments(req, res, pathname, requestUrl)).catch(error => { console.error('comments:', error); send(res, 400, { error: error.message || 'Comment request failed' }); });
+  }
   if (req.method === 'GET' && req.url.startsWith('/api/health')) {
     return send(res, 200, { ok: true, articles: loadArticles().length, updated: updatedDate(), updatedLabel: articleDate(), ai: false });
   }
   if (req.method === 'GET' && (req.url === '/api/kb' || req.url.startsWith('/api/search'))) {
     const url = new URL(req.url, 'http://localhost');
+    const user = currentUser(req);
+    const query = url.searchParams.get('q') || '';
+    const location = url.searchParams.get('location') || '';
+    const topic = url.searchParams.get('topic') || url.searchParams.get('category') || '';
+    if (user && (query || location || topic)) {
+      const detail = query ? `Searched for: ${query}` : `Filtered guides${location ? ` by ${location}` : ''}${topic ? ` by ${topic}` : ''}`;
+      recordActivity(user.id, req, 'search', detail);
+    }
     const articles = loadArticles();
-    const results = searchArticles(articles, url.searchParams.get('q') || '', { location: url.searchParams.get('location') || '', topic: url.searchParams.get('topic') || url.searchParams.get('category') || '' });
+    const results = searchArticles(articles, query, { location, topic });
     const catalog = readJson(tagsPath);
     const count = (field, id) => articles.filter(article => (article[field] || []).includes(id)).length;
     const locations = catalog.locations.map(tag => ({ ...tag, count: count('locations', tag.id) }));

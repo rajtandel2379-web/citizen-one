@@ -22,6 +22,10 @@ Set a strong `ADMIN_PASSWORD` on the server, then open `/admin`. The admin page 
 
 Admin sessions are HttpOnly, SameSite cookies with a 12-hour lifetime. Rich text is sanitized on the server. Image uploads are limited to PNG, JPG, WebP or GIF files smaller than 5 MB. On writable hosts they are stored under `public/uploads`; on read-only serverless hosts they are embedded as validated image data URLs. Image URLs can also be added directly. If a serverless host also makes the article data read-only, admin changes use its writable runtime temp directory for the lifetime of that warm instance; use a database or object store for durable production publishing.
 
+The admin portal also includes registered users, their recent activity and access IP addresses, plus comment editing, deletion and per-guide comment locks. Visitors see an optional registration or login prompt and can continue as guests. Accounts use name, email and phone details to sign in and do not use password or email/SMS verification. Public comments are available to guests and accounts. Account and comment records are stored in `data/users.json` and `data/comments.json` on writable deployments; these files are ignored by Git because they contain personal information. Set up durable, access-controlled database storage before using a serverless deployment for real user data.
+
+On reverse-proxy deployments other than Vercel, set `TRUST_PROXY=1` only when the proxy controls the forwarded-IP headers; otherwise the app records the direct connection address.
+
 For production, host this app on a service with persistent storage or move article/image persistence to a database/object store. Ephemeral filesystem deployments can lose admin changes during a redeploy or restart.
 
 `vercel.json` and `api/index.js` are included for Vercel-compatible serverless routing. Vercel can serve the public site and admin UI, but its function filesystem is not durable; use a persistent database or object store before relying on admin publishing there. A VPS, Render persistent disk, Railway volume or similar is suitable for the current file-backed admin store.
@@ -82,7 +86,7 @@ GET /api/search?q=illegal%20hawkers
 GET /api/search?location=mumbai&topic=street-hawkers
 ```
 
-The server also provides `/robots.txt`, `/sitemap.xml`, `/privacy`, SEO-friendly `/guides/:id` pages, legacy 301 redirects from `/guide/:id` and `/article/:id`, and a custom HTML 404 page.
+The server also provides `/robots.txt`, `/sitemap.xml`, `/privacy`, `/terms`, SEO-friendly `/guides/:id` pages, legacy 301 redirects from `/guide/:id` and `/article/:id`, and a custom HTML 404 page.
 
 ## Content maintenance
 
