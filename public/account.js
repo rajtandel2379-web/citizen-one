@@ -9,11 +9,19 @@
   };
   let currentUser = null;
   let authChecked = false;
+  let guestAccess = false;
   const pendingActivity = [];
   let accountMode = 'register';
   let prompt;
   const storageGet = (storage, key) => { try { return storage.getItem(key); } catch { return null; } };
   const storageSet = (storage, key, value) => { try { storage.setItem(key, value); } catch {} };
+
+  async function refreshAccess() {
+    try {
+      const data = await api('/api/access');
+      guestAccess = data.guestAccess === true;
+    } catch { guestAccess = false; }
+  }
 
   function addStyles() {
     if (document.querySelector('#c1-account-styles')) return;
@@ -71,7 +79,10 @@
     root.querySelector('[data-account-view="signed-in"]').hidden = true;
     root.setAttribute('aria-labelledby', 'c1-account-title');
     root.querySelector('#c1-account-title').textContent = mode === 'register' ? 'Create your account' : 'Log in';
-    root.querySelector('[data-account-intro]').textContent = mode === 'register' ? 'Create a simple account to join the discussion. Browsing is also available as a guest.' : 'Enter the email address and mobile number you used when registering.';
+    root.querySelector('[data-account-intro]').textContent = mode === 'register' ? (guestAccess ? 'Create a simple account to join the discussion. Browsing is also available as a guest.' : 'Register to access the Citizen One guides. Your name is collected only during registration.') : 'Enter the email address and mobile number you used when registering.';
+    const guestButton = root.querySelector('[data-account-guest]');
+    guestButton.hidden = !guestAccess;
+    guestButton.disabled = !guestAccess;
     const nameField = root.querySelector('[name="name"]');
     nameField.closest('label').hidden = mode !== 'register';
     nameField.disabled = mode !== 'register';
@@ -118,6 +129,7 @@
       const result = await api(accountMode === 'register' ? '/api/account/register' : '/api/account/login', { method: 'POST', body: JSON.stringify(data) });
       currentUser = result.user;
       if (accountMode === 'register') storageSet(localStorage, 'c1-account-created', '1');
+      if (document.querySelector('.access-gate')) { window.location.reload(); return; }
       closePrompt();
       updateCommentForms();
       const articleId = location.pathname.startsWith('/guides/') ? decodeURIComponent(location.pathname.slice('/guides/'.length)) : location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
@@ -209,6 +221,7 @@
   async function init() {
     addStyles();
     addAccountButton();
+    await refreshAccess();
     await initComments();
     try {
       const data = await api('/api/account/me');

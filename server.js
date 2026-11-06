@@ -53,6 +53,14 @@ function readAdminState() {
   try { return readJson(adminStatePath); } catch { return { deletedLegacy: [] }; }
 }
 
+function guestAccessEnabled() {
+  return readAdminState().guestAccess === true;
+}
+
+function canAccessContent(req) {
+  return guestAccessEnabled() || Boolean(currentUser(req));
+}
+
 function writeJsonAtomic(file, value) {
   const contents = JSON.stringify(value, null, 2) + '\n';
   const temp = `${file}.${process.pid}.tmp`;
@@ -317,14 +325,17 @@ async function handleAccount(req, res, pathname) {
 async function handleComments(req, res, pathname, requestUrl) {
   if (pathname === '/api/comments' && req.method === 'GET') {
     const articleId = String(requestUrl.searchParams.get('articleId') || '');
+    const user = currentUser(req);
+    if (!guestAccessEnabled() && !user) return send(res, 401, { error: 'A registered account is required to view comments.' });
     if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
     const store = readCommentStore();
-    const user = currentUser(req);
     if (user) touchUser(user, req);
     const comments = store.items.filter(item => item.articleId === articleId).map(({ id, name, text, createdAt, updatedAt }) => ({ id, name, text, createdAt, updatedAt }));
     return send(res, 200, { comments, locked: store.lockedArticleIds.includes(articleId), user: publicUser(user) });
   }
   if (pathname === '/api/comments' && req.method === 'POST') {
+    const user = currentUser(req);
+    if (!guestAccessEnabled() && !user) return send(res, 401, { error: 'A registered account is required to comment.' });
     const input = await readRequestJson(req);
     const articleId = String(input.articleId || '').slice(0, 100);
     if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
@@ -334,7 +345,6 @@ async function handleComments(req, res, pathname, requestUrl) {
     const attempts = (commentAttempts.get(ip) || []).filter(value => Date.now() - value < 60 * 60 * 1000);
     if (attempts.length >= 8) { commentAttempts.set(ip, attempts); return send(res, 429, { error: 'Please wait before posting another comment.' }); }
     const text = String(input.text || '').trim().slice(0, 2000);
-    const user = currentUser(req);
     const name = String(user?.name || input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
     if (name.length < 2) return send(res, 400, { error: 'Enter a name to show with your comment.' });
     if (text.length < 2) return send(res, 400, { error: 'Write a comment before posting.' });
@@ -574,12 +584,12 @@ function renderAboutPage() {
 }
 
 function renderPrivacyPage() {
-  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Privacy</span></nav><p class="eyebrow">Last updated 6 November 2026</p><h1>Privacy policy</h1><p class="detail-summary">This notice explains what Citizen One collects when you browse as a guest, create an account, search, or post a comment, and what it is used for.</p><section class="detail-section"><h2>Who operates this site</h2><p>Citizen One is a civic information project created by Raj Tandel. For privacy questions or requests, contact <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>.</p></section><section class="detail-section"><h2>Information we collect</h2><ul class="checklist"><li><strong>Account:</strong> your name, email address, and phone number when you choose to register; an optional city or area if you provide it; and the date and version of the Terms and Conditions you accept. Location is optional. Registration is optional for browsing.</li><li><strong>Session and activity:</strong> the IP address used to access an account, account sign-in and sign-out, pages or guides viewed, searches submitted, and comments posted. Activity entries include a date and time.</li><li><strong>Comments:</strong> the name shown with the comment, its text, the guide it appears on, and the IP address used to submit it. Comments and display names are public. Registered comments are linked to the account internally.</li><li><strong>Local preferences:</strong> theme, privacy display, cookie choice, and whether the account prompt has already been shown may be stored in your browser.</li><li><strong>Technical request data:</strong> the hosting service may process IP address, request time, and requested page to deliver and protect the site.</li></ul><p>Do not submit Aadhaar, PAN, OTPs, passwords, bank details, or sensitive personal information in a comment. This site does not request them.</p></section><section class="detail-section"><h2>Why we use it</h2><p>Account information enables the optional account sign-in experience. Optional location is available to the administrator as profile information. IP addresses and activity records help the administrator understand account access, maintain site security, and respond to abuse. Comments are displayed with the name you provide and can be edited, removed, or locked by the administrator. Local preferences remember your choices. Optional analytics load only after you accept them and only when an analytics ID is configured.</p></section><section class="detail-section"><h2>Accounts and sign-in</h2><p>Registration asks for your name, email, and mobile number; city or area is optional. Sign-in checks only the email and mobile number provided at registration. It does not send an email or SMS verification code. Anyone who knows both sign-in details may be able to access that account, so keep them private and do not use the account to store sensitive information. You can continue as a guest instead.</p></section><section class="detail-section"><h2>Public comments</h2><p>Comments are visible to visitors. Do not include private information or anything you would not want published. Guests may comment using a display name; registered comments are linked to the account. The administrator can edit or delete comments and can close comments on any guide.</p></section><section class="detail-section"><h2>Sharing, storage, and retention</h2><p>Account, activity, and comment data is stored by the site and its hosting provider. We do not sell it or use it for advertising. The administrator can access account details, IP addresses, activity, and moderation records. Data may also be disclosed when required to protect the site, comply with law, or respond to a valid legal request. Account activity is limited to the most recent 500 events and the most recent 30 distinct IP addresses. Account and comment data is kept while needed to operate the service or moderate public discussions; deletion requests can be sent to the contact above. Deleting an account removes its account record and associated comments.</p></section><section class="detail-section"><h2>Your choices</h2><p>You can browse without registering, choose whether to enable optional analytics, and ask to access, correct, or delete your account information by emailing the contact above. You may also ask the administrator to remove a comment. The site may retain information that must be kept for security, moderation, or legal reasons.</p></section><section class="detail-section"><h2>Cookies and analytics</h2><p>Essential account sessions use a secure, HttpOnly cookie where HTTPS is available. Theme, privacy view, and cookie choices use browser storage. Optional Google Analytics is disabled unless this deployment configures it and you accept the analytics choice.</p></section><section class="detail-section"><h2>Changes</h2><p>We may update this notice when the site or its data practices change. The latest revision date appears above. Please review this page before creating an account or commenting.</p></section></article>`;
+  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Privacy</span></nav><p class="eyebrow">Last updated 6 November 2026</p><h1>Privacy policy</h1><p class="detail-summary">This notice explains what Citizen One collects when you browse as a guest, create an account, search, or post a comment, and what it is used for.</p><section class="detail-section"><h2>Who operates this site</h2><p>Citizen One is a civic information project created by Raj Tandel. For privacy questions or requests, contact <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>.</p></section><section class="detail-section"><h2>Information we collect</h2><ul class="checklist"><li><strong>Account:</strong> your name, email address, and phone number when you choose to register; an optional city or area if you provide it; and the date and version of the Terms and Conditions you accept. Location is optional. Registration may be optional when guest access is enabled; when it is off, a registered account is required to view guides.</li><li><strong>Session and activity:</strong> the IP address used to access an account, account sign-in and sign-out, pages or guides viewed, searches submitted, and comments posted. Activity entries include a date and time.</li><li><strong>Comments:</strong> the name shown with the comment, its text, the guide it appears on, and the IP address used to submit it. Comments and display names are public. Registered comments are linked to the account internally.</li><li><strong>Local preferences:</strong> theme, privacy display, cookie choice, and whether the account prompt has already been shown may be stored in your browser.</li><li><strong>Technical request data:</strong> the hosting service may process IP address, request time, and requested page to deliver and protect the site.</li></ul><p>Do not submit Aadhaar, PAN, OTPs, passwords, bank details, or sensitive personal information in a comment. This site does not request them.</p></section><section class="detail-section"><h2>Why we use it</h2><p>Account information enables account sign-in and registered-only access when guest access is disabled. Optional location is available to the administrator as profile information. IP addresses and activity records help the administrator understand account access, maintain site security, and respond to abuse. Comments are displayed with the name you provide and can be edited, removed, or locked by the administrator. Local preferences remember your choices. Optional analytics load only after you accept them and only when an analytics ID is configured.</p></section><section class="detail-section"><h2>Accounts and sign-in</h2><p>Registration asks for your name, email, and mobile number; city or area is optional. Sign-in checks only the email and mobile number provided at registration. It does not send an email or SMS verification code. Anyone who knows both sign-in details may be able to access that account, so keep them private and do not use the account to store sensitive information. You can continue as a guest instead.</p></section><section class="detail-section"><h2>Public comments</h2><p>Comments are visible to visitors. Do not include private information or anything you would not want published. When guest access is enabled, guests may comment using a display name; registered comments are linked to the account. The administrator can edit or delete comments and can close comments on any guide.</p></section><section class="detail-section"><h2>Sharing, storage, and retention</h2><p>Account, activity, and comment data is stored by the site and its hosting provider. We do not sell it or use it for advertising. The administrator can access account details, IP addresses, activity, and moderation records. Data may also be disclosed when required to protect the site, comply with law, or respond to a valid legal request. Account activity is limited to the most recent 500 events and the most recent 30 distinct IP addresses. Account and comment data is kept while needed to operate the service or moderate public discussions; deletion requests can be sent to the contact above. Deleting an account removes its account record and associated comments.</p></section><section class="detail-section"><h2>Your choices</h2><p>When guest access is enabled, you can browse without registering. You can also choose whether to enable optional analytics and ask to access, correct, or delete your account information by emailing the contact above. You may also ask the administrator to remove a comment. The site may retain information that must be kept for security, moderation, or legal reasons.</p></section><section class="detail-section"><h2>Cookies and analytics</h2><p>Essential account sessions use a secure, HttpOnly cookie where HTTPS is available. Theme, privacy view, and cookie choices use browser storage. Optional Google Analytics is disabled unless this deployment configures it and you accept the analytics choice.</p></section><section class="detail-section"><h2>Changes</h2><p>We may update this notice when the site or its data practices change. The latest revision date appears above. Please review this page before creating an account or commenting.</p></section></article>`;
   return renderDocument({ title: 'Privacy policy | Citizen One', description: 'What Citizen One collects for accounts, IP and activity records, comments, local preferences, and analytics.', canonical: '/privacy', body }).html;
 }
 
 function renderTermsPage() {
-  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Terms and Conditions</span></nav><p class="eyebrow">Last updated 6 November 2026</p><h1>Terms and Conditions</h1><p class="detail-summary">These terms apply when you use Citizen One, create an account, or post a comment.</p><section class="detail-section"><h2>Using Citizen One</h2><p>Citizen One provides general civic information and links to reporting channels. It is an independent project, not a government service, and does not submit complaints on your behalf. Guides are for general information, may be incomplete or out of date, and are not legal advice. Check important details with the responsible authority before acting. For immediate danger in India, contact emergency services at 112.</p></section><section class="detail-section"><h2>Accounts</h2><p>Registration is optional for browsing. Provide your name, email, and mobile number to create an account; city or area is optional. Sign-in checks only your registered email and mobile number and does not send a verification code. Keep those sign-in details private; the account is not suitable for confidential or sensitive information. You may continue as a guest.</p></section><section class="detail-section"><h2>Comments</h2><p>Comments are public. Only post material you have the right to share. Do not post personal contact details, sensitive information, threats, harassment, unlawful content, spam, or content that violates another person’s rights. You remain responsible for what you submit. The administrator may edit or remove comments, restrict comment access, or lock comments on a guide.</p></section><section class="detail-section"><h2>Privacy and moderation</h2><p>By registering, you ask Citizen One to use your name, email, mobile number, and any optional city or area you provide to provide account access as described in the <a href="/privacy">Privacy Policy</a>. Account IP addresses and activity are recorded for account administration and site security. Comment names and text are publicly displayed; IP addresses are retained privately for moderation and security.</p></section><section class="detail-section"><h2>Availability and external sites</h2><p>The site and its content may change or become temporarily unavailable. Links to government and other external websites are provided for convenience; Citizen One does not control or guarantee their content, availability, or policies.</p></section><section class="detail-section"><h2>Contact</h2><p>Questions about these terms, an account, or a comment can be sent to <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>.</p></section></article>`;
+  const body = `<article class="standalone-detail simple-page"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Guides</a><span>›</span><span>Terms and Conditions</span></nav><p class="eyebrow">Last updated 6 November 2026</p><h1>Terms and Conditions</h1><p class="detail-summary">These terms apply when you use Citizen One, create an account, or post a comment.</p><section class="detail-section"><h2>Using Citizen One</h2><p>Citizen One provides general civic information and links to reporting channels. It is an independent project, not a government service, and does not submit complaints on your behalf. Guides are for general information, may be incomplete or out of date, and are not legal advice. Check important details with the responsible authority before acting. For immediate danger in India, contact emergency services at 112.</p></section><section class="detail-section"><h2>Accounts</h2><p>Registration may be optional when guest access is enabled; when it is off, a registered account is required to view guides. Provide your name, email, and mobile number to create an account; city or area is optional. Sign-in checks only your registered email and mobile number and does not send a verification code. Keep those sign-in details private; the account is not suitable for confidential or sensitive information. You may continue as a guest.</p></section><section class="detail-section"><h2>Comments</h2><p>Comments are public. Only post material you have the right to share. Do not post personal contact details, sensitive information, threats, harassment, unlawful content, spam, or content that violates another person’s rights. You remain responsible for what you submit. The administrator may edit or remove comments, restrict comment access, or lock comments on a guide.</p></section><section class="detail-section"><h2>Privacy and moderation</h2><p>By registering, you ask Citizen One to use your name, email, mobile number, and any optional city or area you provide to provide account access as described in the <a href="/privacy">Privacy Policy</a>. Account IP addresses and activity are recorded for account administration and site security. Comment names and text are publicly displayed; IP addresses are retained privately for moderation and security.</p></section><section class="detail-section"><h2>Availability and external sites</h2><p>The site and its content may change or become temporarily unavailable. Links to government and other external websites are provided for convenience; Citizen One does not control or guarantee their content, availability, or policies.</p></section><section class="detail-section"><h2>Contact</h2><p>Questions about these terms, an account, or a comment can be sent to <a href="mailto:${escapeHtml(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a>.</p></section></article>`;
   return renderDocument({ title: 'Terms and Conditions | Citizen One', description: 'Terms for using Citizen One, creating an account, and posting public comments.', canonical: '/terms', body }).html;
 }
 
@@ -632,7 +642,7 @@ function deleteAdminArticle(id) {
 }
 
 async function handleAdmin(req, res, pathname) {
-  if (pathname === '/api/admin/status' && req.method === 'GET') return send(res, 200, { configured: Boolean(ADMIN_PASSWORD), authenticated: currentAdmin(req) });
+  if (pathname === '/api/admin/status' && req.method === 'GET') return send(res, 200, { configured: Boolean(ADMIN_PASSWORD), authenticated: currentAdmin(req), guestAccess: guestAccessEnabled() });
   if (pathname === '/api/admin/login' && req.method === 'POST') {
     if (!ADMIN_PASSWORD) return send(res, 503, { error: 'Admin is not configured. Set ADMIN_PASSWORD on the server.' });
     const input = await readRequestJson(req);
@@ -648,6 +658,14 @@ async function handleAdmin(req, res, pathname) {
   }
   if (!pathname.startsWith('/api/admin/')) return false;
   if (!requireAdmin(req, res)) return true;
+  if (pathname === '/api/admin/access' && req.method === 'GET') return send(res, 200, { guestAccess: guestAccessEnabled() });
+  if (pathname === '/api/admin/access' && req.method === 'PUT') {
+    const input = await readRequestJson(req);
+    const state = readAdminState();
+    state.guestAccess = input.guestAccess === true;
+    writeJsonAtomic(adminStatePath, state);
+    return send(res, 200, { guestAccess: state.guestAccess });
+  }
   if (pathname === '/api/admin/images' && req.method === 'POST') {
     const input = await readRequestJson(req);
     const match = String(input.data || '').match(/^data:(image\/(?:png|jpeg|jpg|webp|gif));base64,([A-Za-z0-9+/=]+)$/i);
@@ -765,6 +783,24 @@ function renderHomePage(params = new URLSearchParams()) {
   return html;
 }
 
+function renderAccessGatePage() {
+  const file = path.join(PUBLIC, 'index.html');
+  let html = fs.readFileSync(file, 'utf8');
+  const gate = `<main id="main-content"><section class="access-gate" aria-labelledby="access-gate-title"><p class="eyebrow">Registered access</p><h1 id="access-gate-title">Sign in to view Citizen One guides.</h1><p>Registration is required while guest access is turned off. Create an account once, then use your registered email and mobile number to sign in.</p><button type="button" class="primary-link" id="access-account-button">Register or log in</button><p class="access-gate-note">Your registration name is collected once. Login uses only email and mobile number.</p></section></main>`;
+  html = html.replace(/<main id="main-content">[\s\S]*?<\/main>/, gate);
+  html = html.replace(/<section class="faq"[\s\S]*?<\/section>/, '');
+  html = html.replace('<title>Citizen One | Civic reporting guides</title>', '<title>Registered access | Citizen One</title>');
+  html = html.replace('</style>', '.access-gate{max-width:720px;margin:100px auto 140px;padding:42px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}.access-gate h1{font-size:clamp(34px,5vw,56px);margin-bottom:18px}.access-gate p{max-width:650px;color:var(--muted);font-size:17px}.access-gate .primary-link{display:inline-block;margin-top:12px;background:var(--brand);color:#fff;border-color:var(--brand)}.access-gate-note{font-size:13px!important;margin-top:22px}</style>');
+  html = html.replace('<span id="copyright-year"></span>', String(new Date().getFullYear()));
+  html = html.replace('mailto:?subject=Citizen%20One%20feedback', contactHref());
+  html = html.replace('<meta name="theme-color" content="#17634a">', `<meta name="theme-color" content="#17634a">${trackingMeta()}`);
+  const scriptStart = html.indexOf('<script src="/account.js"></script>');
+  if (scriptStart >= 0) {
+    html = `${html.slice(0, scriptStart)}<script src="/account.js"></script><script>document.getElementById('access-account-button')?.addEventListener('click', () => window.CitizenOneAccount?.open());</script></body></html>`;
+  }
+  return html;
+}
+
 function send(res, code, body, type = 'application/json; charset=utf-8', headers = {}) {
   res.writeHead(code, { 'content-type': type, 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer', ...headers });
   res.end(type.startsWith('application/json') ? JSON.stringify(body) : body);
@@ -787,7 +823,7 @@ const requestHandler = (req, res) => {
     return send(res, 200, `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/admin\nSitemap: ${SITE_URL}/sitemap.xml\n`, 'text/plain; charset=utf-8');
   }
   if (req.method === 'GET' && pathname === '/sitemap.xml') {
-    return send(res, 200, sitemapXml(loadArticles()), 'application/xml; charset=utf-8');
+    return send(res, 200, sitemapXml(canAccessContent(req) ? loadArticles() : []), 'application/xml; charset=utf-8');
   }
   if (req.method === 'GET' && pathname === '/privacy') {
     return send(res, 200, renderPrivacyPage(), 'text/html; charset=utf-8');
@@ -796,6 +832,7 @@ const requestHandler = (req, res) => {
     return send(res, 200, renderTermsPage(), 'text/html; charset=utf-8');
   }
   if (req.method === 'GET' && pathname === '/about') {
+    if (!canAccessContent(req)) return send(res, 200, renderAccessGatePage(), 'text/html; charset=utf-8');
     const page = renderAboutPage();
     return send(res, 200, page, 'text/html; charset=utf-8');
   }
@@ -804,6 +841,7 @@ const requestHandler = (req, res) => {
     return res.writeHead(301, { location: `/guides/${encodeURIComponent(id)}`, 'cache-control': 'public, max-age=86400' }).end();
   }
   if (req.method === 'GET' && pathname.startsWith('/guides/')) {
+    if (!canAccessContent(req)) return send(res, 200, renderAccessGatePage(), 'text/html; charset=utf-8');
     const id = decodeURIComponent(pathname.slice('/guides/'.length));
     const article = loadArticles().find(item => item.id === id);
     if (!article) {
@@ -813,6 +851,7 @@ const requestHandler = (req, res) => {
     return send(res, 200, renderGuidePage(article), 'text/html; charset=utf-8');
   }
   if (req.method === 'GET' && pathname === '/') {
+    if (!canAccessContent(req)) return send(res, 200, renderAccessGatePage(), 'text/html; charset=utf-8');
     return send(res, 200, renderHomePage(requestUrl.searchParams), 'text/html; charset=utf-8');
   }
   if (pathname === '/admin' || pathname === '/admin/') {
@@ -825,6 +864,9 @@ const requestHandler = (req, res) => {
   if (pathname.startsWith('/api/account/') || pathname === '/api/activity') {
     return Promise.resolve(handleAccount(req, res, pathname)).catch(error => { console.error('account:', error); send(res, 400, { error: error.message || 'Account request failed' }); });
   }
+  if (pathname === '/api/access' && req.method === 'GET') {
+    return send(res, 200, { guestAccess: guestAccessEnabled(), authenticated: Boolean(currentUser(req)) });
+  }
   if (pathname === '/api/comments') {
     return Promise.resolve(handleComments(req, res, pathname, requestUrl)).catch(error => { console.error('comments:', error); send(res, 400, { error: error.message || 'Comment request failed' }); });
   }
@@ -834,6 +876,7 @@ const requestHandler = (req, res) => {
   if (req.method === 'GET' && (req.url === '/api/kb' || req.url.startsWith('/api/search'))) {
     const url = new URL(req.url, 'http://localhost');
     const user = currentUser(req);
+    if (!guestAccessEnabled() && !user) return send(res, 401, { error: 'A registered account is required to access the guides.' });
     const query = url.searchParams.get('q') || '';
     const location = url.searchParams.get('location') || '';
     const topic = url.searchParams.get('topic') || url.searchParams.get('category') || '';
