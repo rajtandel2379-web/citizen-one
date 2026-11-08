@@ -4,6 +4,14 @@
   "private": true,
   "description": "Citizen One: a searchable civic reporting knowledge base for Maharashtra.",
   "main": "server.js",
-  "scripts": { "start": "node server.js", "test": "node test.js" },
-  "engines": { "node": ">=20" }
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
 }
