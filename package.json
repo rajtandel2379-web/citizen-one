@@ -4,6 +4,17 @@
   "private": true,
   "description": "Citizen One: a searchable civic reporting knowledge base for Maharashtra.",
   "main": "server.js",
-  "scripts": { "start": "node server.js", "test": "node test.js" },
-  "engines": { "node": ">=20" }
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
 }

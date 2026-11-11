@@ -7,13 +7,32 @@ const path = require('path');
 const crypto = require('crypto');
 const net = require('net');
 
+// Load environment variables from .env if present
+try {
+  const envPath = path.join(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match && !process.env[match[1]]) {
+        let value = match[2] || '';
+        if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+        if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
+        process.env[match[1]] = value.trim();
+      }
+    }
+  }
+} catch {}
+
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const PORT = process.env.PORT || 3000;
 const PUBLIC = path.join(__dirname, 'public');
 const articlesPath = path.join(__dirname, 'data', 'articles.json');
 const legacyPath = path.join(__dirname, 'data', 'kb.json');
 const tagsPath = path.join(__dirname, 'data', 'tags.json');
 const adminStatePath = path.join(__dirname, 'data', 'admin-state.json');
-const usersPath = path.join(__dirname, 'data', 'users.json');
 const commentsPath = path.join(__dirname, 'data', 'comments.json');
 const uploadsPath = path.join(PUBLIC, 'uploads');
 const SITE_URL = (process.env.SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
@@ -24,7 +43,73 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 const sessions = new Map();
 const userSessions = new Map();
 const authAttempts = new Map();
-const commentAttempts = new Map();
+const otpEmailAttempts = new Map(); // Rate limit: max 5 OTP requests per 15 min per email
+
+function hashOtp(otp) {
+  return crypto.createHash('sha256').update(String(otp)).digest('hex');
+}
+
+function generateOtp() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function allowOtpEmailAttempt(email) {
+  const key = String(email || '').toLowerCase().trim();
+  const now = Date.now();
+  const attempts = (otpEmailAttempts.get(key) || []).filter(val => now - val < 15 * 60 * 1000);
+  if (attempts.length >= 5) {
+    otpEmailAttempts.set(key, attempts);
+    return false;
+  }
+  attempts.push(now);
+  otpEmailAttempts.set(key, attempts);
+  return true;
+}
+
+async function sendBrevoOtpEmail(email, otp) {
+  const apiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.CONTACT_EMAIL || 'noreply@citizen-one.org';
+  const senderName = process.env.BREVO_SENDER_NAME || 'Citizen One';
+
+  if (!apiKey) {
+    console.warn(`[DEV/TEST OTP] Brevo API key not set. OTP for ${email}: ${otp}`);
+    return { ok: true, devMode: true };
+  }
+
+  const payload = {
+    sender: { name: senderName, email: senderEmail },
+    to: [{ email }],
+    subject: `Your Citizen One verification code: ${otp}`,
+    htmlContent: `
+      <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #dfe7e0; border-radius: 12px;">
+        <h2 style="color: #17634a; margin-top: 0;">Citizen One Verification</h2>
+        <p>Your 6-digit login verification code is:</p>
+        <div style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #17634a; background: #eef3ee; padding: 12px 18px; border-radius: 8px; display: inline-block; margin: 12px 0;">
+          ${otp}
+        </div>
+        <p style="color: #6d786f; font-size: 13px;">This code will expire in 5 minutes. If you did not request this code, you can safely ignore this email.</p>
+      </div>
+    `
+  };
+
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+      'content-type': 'application/json',
+      accept: 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Brevo API error:', response.status, errorBody);
+    throw new Error('Failed to send verification email. Please try again.');
+  }
+
+  return { ok: true };
+}
 const SESSION_TTL = 12 * 60 * 60 * 1000;
 const USER_SESSION_TTL = 30 * 24 * 60 * 60 * 1000;
 const runtimeScope = process.env.VERCEL_DEPLOYMENT_ID || process.env.VERCEL_GIT_COMMIT_SHA || 'local';
@@ -49,12 +134,39 @@ function readJson(file) {
   }
 }
 
+let cachedAdminState = { guestAccess: false, deletedLegacy: [], updated: '2026-11-04' };
+
 function readAdminState() {
-  try { return readJson(adminStatePath); } catch { return { deletedLegacy: [] }; }
+  return cachedAdminState;
+}
+
+async function syncAdminState() {
+  try {
+    const record = await prisma.adminState.findUnique({ where: { key: 'global' } });
+    if (record && record.value && typeof record.value === 'object') {
+      cachedAdminState = { ...cachedAdminState, ...record.value };
+    }
+  } catch (error) {
+    console.error('syncAdminState error:', error);
+  }
+}
+
+async function updateAdminState(patch) {
+  cachedAdminState = { ...cachedAdminState, ...patch };
+  try {
+    await prisma.adminState.upsert({
+      where: { key: 'global' },
+      update: { value: cachedAdminState },
+      create: { key: 'global', value: cachedAdminState }
+    });
+  } catch (error) {
+    console.error('updateAdminState error:', error);
+  }
+  return cachedAdminState;
 }
 
 function guestAccessEnabled() {
-  return readAdminState().guestAccess === true;
+  return cachedAdminState.guestAccess === true;
 }
 
 function canAccessContent(req) {
@@ -193,46 +305,203 @@ function currentUser(req) {
     if (token) userSessions.delete(token);
     return null;
   }
-  return readUsers().find(user => user.id === session.userId) || null;
+  return cachedUsers.get(session.userId) || null;
 }
 
-function readUsers() {
-  try { return readJson(usersPath); } catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+const cachedUsers = new Map();
+let cachedArticles = [];
+
+function formatArticleFromDb(doc, catalog) {
+  const locationLabels = new Map((catalog?.locations || []).map(tag => [tag.id, tag.label]));
+  const categoryLabels = new Map((catalog?.categories || []).map(tag => [tag.id, tag.label]));
+  const locations = Array.isArray(doc.locations) ? doc.locations : [];
+  const categories = Array.isArray(doc.categories) ? doc.categories : (doc.category ? [doc.category] : []);
+  return {
+    id: doc.id,
+    category: doc.category || 'admin-guides',
+    categoryLabel: doc.categoryLabel || categoryLabels.get(categories[0]) || 'Other guides',
+    title: doc.title,
+    summary: doc.summary || '',
+    locations,
+    categories,
+    tags: Array.isArray(doc.tags) ? doc.tags : [],
+    status: doc.status === 'draft' ? 'draft' : 'published',
+    sections: (doc.sections || []).map(s => ({
+      heading: s.heading || 'Untitled section',
+      body: s.body || '',
+      ...(s.html ? { html: sanitizeRichText(s.html) } : {}),
+      steps: Array.isArray(s.steps) ? s.steps : [],
+      checklist: Array.isArray(s.checklist) ? s.checklist : [],
+      channels: (s.channels || []).map(c => ({
+        name: c.name || '',
+        contact: c.contact || '',
+        ...(c.url ? { url: c.url } : {})
+      }))
+    })),
+    sources: Array.isArray(doc.sources) ? doc.sources : [],
+    locationLabels: locations.map(id => locationLabels.get(id) || id),
+    categoryLabels: categories.map(id => categoryLabels.get(id) || id),
+    source: 'admin'
+  };
 }
 
-function touchUser(user, req) {
+async function syncArticlesCache() {
+  try {
+    const catalog = readJson(tagsPath);
+    const dbArticles = await prisma.article.findMany({
+      include: {
+        sections: {
+          include: { channels: true }
+        }
+      }
+    });
+    if (dbArticles.length) {
+      cachedArticles = dbArticles.map(doc => formatArticleFromDb(doc, catalog));
+    }
+  } catch (error) {
+    console.error('syncArticlesCache error:', error);
+  }
+}
+
+async function syncUsersCache() {
+  try {
+    const users = await prisma.user.findMany({
+      include: { ips: true, activities: true }
+    });
+    cachedUsers.clear();
+    for (const u of users) {
+      cachedUsers.set(u.id, formatUserRecord(u));
+    }
+  } catch (error) {
+    console.error('syncUsersCache error:', error);
+  }
+}
+
+function formatUserRecord(user) {
+  if (!user) return null;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    location: user.location,
+    createdAt: user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
+    updatedAt: user.updatedAt instanceof Date ? user.updatedAt.toISOString() : user.updatedAt,
+    lastSeenAt: user.lastSeenAt instanceof Date ? user.lastSeenAt.toISOString() : user.lastSeenAt,
+    termsAcceptedAt: user.termsAcceptedAt instanceof Date ? user.termsAcceptedAt.toISOString() : user.termsAcceptedAt,
+    termsVersion: user.termsVersion,
+    ips: (user.ips || []).map(ip => ({
+      address: ip.address,
+      firstSeenAt: ip.firstSeenAt instanceof Date ? ip.firstSeenAt.toISOString() : ip.firstSeenAt,
+      lastSeenAt: ip.lastSeenAt instanceof Date ? ip.lastSeenAt.toISOString() : ip.lastSeenAt
+    })),
+    activities: (user.activities || []).map(a => ({
+      id: a.id,
+      type: a.type,
+      detail: a.detail,
+      ip: a.ip,
+      at: a.at instanceof Date ? a.at.toISOString() : a.at
+    }))
+  };
+}
+
+async function readUsers() {
+  try {
+    const users = await prisma.user.findMany({
+      include: { ips: true, activities: true }
+    });
+    const formatted = users.map(formatUserRecord);
+    cachedUsers.clear();
+    for (const u of formatted) cachedUsers.set(u.id, u);
+    return formatted;
+  } catch (error) {
+    console.error('readUsers error:', error);
+    return Array.from(cachedUsers.values());
+  }
+}
+
+async function touchUser(user, req) {
   if (!user) return;
-  const users = readUsers();
-  const stored = users.find(item => item.id === user.id);
-  if (!stored) return;
-  const now = new Date().toISOString();
+  const now = new Date();
   const ip = requestIp(req);
-  stored.lastSeenAt = now;
-  stored.ips = Array.isArray(stored.ips) ? stored.ips : [];
-  let known = stored.ips.find(item => item.address === ip);
-  if (known) known.lastSeenAt = now;
-  else stored.ips.push({ address: ip, firstSeenAt: now, lastSeenAt: now });
-  stored.ips = stored.ips.slice(-30);
-  writeJsonAtomic(usersPath, users);
+  try {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastSeenAt: now }
+    });
+    const existingIp = await prisma.userIp.findFirst({
+      where: { userId: user.id, address: ip }
+    });
+    if (existingIp) {
+      await prisma.userIp.update({
+        where: { id: existingIp.id },
+        data: { lastSeenAt: now }
+      });
+    } else {
+      await prisma.userIp.create({
+        data: {
+          userId: user.id,
+          address: ip,
+          firstSeenAt: now,
+          lastSeenAt: now
+        }
+      });
+    }
+    const fresh = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { ips: true, activities: true }
+    });
+    if (fresh) cachedUsers.set(user.id, formatUserRecord(fresh));
+  } catch (error) {
+    console.error('touchUser error:', error);
+  }
 }
 
-function recordActivity(userId, req, type, detail = '') {
+async function recordActivity(userId, req, type, detail = '') {
   if (!userId) return;
-  const users = readUsers();
-  const user = users.find(item => item.id === userId);
-  if (!user) return;
-  const now = new Date().toISOString();
+  const now = new Date();
   const ip = requestIp(req);
-  user.activities = Array.isArray(user.activities) ? user.activities : [];
-  user.activities.push({ id: crypto.randomBytes(8).toString('hex'), type: String(type).slice(0, 40), detail: String(detail).trim().slice(0, 240), ip, at: now });
-  user.activities = user.activities.slice(-500);
-  user.lastSeenAt = now;
-  user.ips = Array.isArray(user.ips) ? user.ips : [];
-  const known = user.ips.find(item => item.address === ip);
-  if (known) known.lastSeenAt = now;
-  else user.ips.push({ address: ip, firstSeenAt: now, lastSeenAt: now });
-  user.ips = user.ips.slice(-30);
-  writeJsonAtomic(usersPath, users);
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lastSeenAt: now }
+    });
+    await prisma.userActivity.create({
+      data: {
+        id: crypto.randomBytes(8).toString('hex'),
+        userId,
+        type: String(type).slice(0, 40),
+        detail: String(detail).trim().slice(0, 240),
+        ip,
+        at: now
+      }
+    });
+    const existingIp = await prisma.userIp.findFirst({
+      where: { userId, address: ip }
+    });
+    if (existingIp) {
+      await prisma.userIp.update({
+        where: { id: existingIp.id },
+        data: { lastSeenAt: now }
+      });
+    } else {
+      await prisma.userIp.create({
+        data: {
+          userId,
+          address: ip,
+          firstSeenAt: now,
+          lastSeenAt: now
+        }
+      });
+    }
+    const fresh = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { ips: true, activities: true }
+    });
+    if (fresh) cachedUsers.set(userId, formatUserRecord(fresh));
+  } catch (error) {
+    console.error('recordActivity error:', error);
+  }
 }
 
 function allowAuthAttempt(req) {
@@ -254,11 +523,30 @@ function publicUser(user) {
   return user ? { id: user.id, name: user.name } : null;
 }
 
-function readCommentStore() {
-  let stored;
-  try { stored = readJson(commentsPath); } catch (error) { if (error.code === 'ENOENT') return { items: [], lockedArticleIds: [] }; throw error; }
-  if (Array.isArray(stored)) return { items: stored, lockedArticleIds: [] };
-  return { items: Array.isArray(stored.items) ? stored.items : [], lockedArticleIds: Array.isArray(stored.lockedArticleIds) ? stored.lockedArticleIds : [] };
+async function readCommentStore() {
+  try {
+    const comments = await prisma.comment.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    const locks = await prisma.commentLock.findMany();
+    return {
+      items: comments.map(c => ({
+        id: c.id,
+        articleId: c.articleId,
+        userId: c.userId,
+        name: c.name,
+        text: c.text,
+        ip: c.ip,
+        editedByAdmin: c.editedByAdmin,
+        createdAt: c.createdAt instanceof Date ? c.createdAt.toISOString() : c.createdAt,
+        updatedAt: c.updatedAt instanceof Date ? c.updatedAt.toISOString() : c.updatedAt
+      })),
+      lockedArticleIds: locks.map(l => l.articleId)
+    };
+  } catch (error) {
+    console.error('readCommentStore error:', error);
+    return { items: [], lockedArticleIds: [] };
+  }
 }
 
 function accountSessionResponse(req, res, user, status = 200) {
@@ -286,22 +574,159 @@ async function handleAccount(req, res, pathname) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return send(res, 400, { error: 'Enter a valid email address.' });
     if (phoneDigits.length < 7 || phoneDigits.length > 15) return send(res, 400, { error: 'Enter a valid phone number.' });
     if (input.termsAccepted !== true) return send(res, 400, { error: 'Please agree to the Terms and Conditions and Privacy Policy.' });
-    const users = readUsers();
-    if (users.some(user => user.email === email)) return send(res, 409, { error: 'An account already uses this email. Log in with your registered email and mobile number.' });
-    const now = new Date().toISOString();
-    const user = { id: crypto.randomBytes(12).toString('hex'), name, email, phone, location, createdAt: now, updatedAt: now, lastSeenAt: now, termsAcceptedAt: now, termsVersion: '2026-11-06', ips: [], activities: [] };
-    users.push(user);
-    writeJsonAtomic(usersPath, users);
-    return accountSessionResponse(req, res, user, 201);
+
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && existing.isVerified) {
+      return send(res, 409, { error: 'An account already uses this email. Please request an OTP to log in.' });
+    }
+
+    if (!allowOtpEmailAttempt(email)) {
+      return send(res, 429, { error: 'Too many OTP requests for this email. Please try again later.' });
+    }
+
+    const now = new Date();
+    let user = existing;
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          id: crypto.randomBytes(12).toString('hex'),
+          name,
+          email,
+          phone,
+          location,
+          isVerified: false,
+          createdAt: now,
+          updatedAt: now,
+          lastSeenAt: now,
+          termsAcceptedAt: now,
+          termsVersion: '2026-11-06'
+        }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { name, phone, location, updatedAt: now }
+      });
+    }
+
+    // Invalidate any previous active OTPs for this user
+    await prisma.emailOtp.deleteMany({ where: { userId: user.id } });
+
+    // Generate 6-digit OTP, expires in 5 minutes
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    await prisma.emailOtp.create({
+      data: {
+        userId: user.id,
+        email,
+        otpHash: hashOtp(otp),
+        expiresAt,
+        attempts: 0
+      }
+    });
+
+    try {
+      await sendBrevoOtpEmail(email, otp);
+    } catch (err) {
+      return send(res, 500, { error: err.message || 'Failed to send verification code email.' });
+    }
+
+    return send(res, 200, { ok: true, requireOtp: true, email, message: 'Verification code sent to your email.' });
   }
+
   if (pathname === '/api/account/login' && req.method === 'POST') {
     if (!allowAuthAttempt(req)) return send(res, 429, { error: 'Too many attempts. Please try again later.' });
     const input = await readRequestJson(req);
     const email = String(input.email || '').trim().toLowerCase();
-    const phone = String(input.phone || '').replace(/[^\d+]/g, '');
-    const user = readUsers().find(item => item.email === email && item.phone === phone);
-    if (!user) return send(res, 401, { error: 'Those details did not match an account.' });
-    return accountSessionResponse(req, res, user);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return send(res, 400, { error: 'Enter a valid email address.' });
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { ips: true, activities: true }
+    });
+    if (!user) return send(res, 404, { error: 'No account found with this email. Please register first.' });
+
+    if (!allowOtpEmailAttempt(email)) {
+      return send(res, 429, { error: 'Too many OTP requests for this email. Please try again later.' });
+    }
+
+    // Invalidate previous OTPs
+    await prisma.emailOtp.deleteMany({ where: { userId: user.id } });
+
+    // Generate 6-digit OTP, expires in 5 minutes
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    await prisma.emailOtp.create({
+      data: {
+        userId: user.id,
+        email,
+        otpHash: hashOtp(otp),
+        expiresAt,
+        attempts: 0
+      }
+    });
+
+    try {
+      await sendBrevoOtpEmail(email, otp);
+    } catch (err) {
+      return send(res, 500, { error: err.message || 'Failed to send verification code email.' });
+    }
+
+    return send(res, 200, { ok: true, requireOtp: true, email, message: 'Verification code sent to your email.' });
+  }
+
+  if (pathname === '/api/account/verify-otp' && req.method === 'POST') {
+    if (!allowAuthAttempt(req)) return send(res, 429, { error: 'Too many attempts. Please try again later.' });
+    const input = await readRequestJson(req);
+    const email = String(input.email || '').trim().toLowerCase();
+    const otp = String(input.otp || '').trim();
+
+    if (!/^\d{6}$/.test(otp)) return send(res, 400, { error: 'Enter a valid 6-digit verification code.' });
+
+    const activeOtp = await prisma.emailOtp.findFirst({
+      where: { email },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (!activeOtp) {
+      return send(res, 400, { error: 'No active verification code found. Please request a new one.' });
+    }
+
+    // Check expiration (5 minutes)
+    if (new Date() > new Date(activeOtp.expiresAt)) {
+      await prisma.emailOtp.delete({ where: { id: activeOtp.id } });
+      return send(res, 400, { error: 'Verification code has expired. Please request a new one.' });
+    }
+
+    // Rate limit: maximum 5 verification attempts per OTP
+    if (activeOtp.attempts >= 5) {
+      await prisma.emailOtp.delete({ where: { id: activeOtp.id } });
+      return send(res, 429, { error: 'Too many failed attempts. Code invalidated. Please request a new one.' });
+    }
+
+    const providedHash = hashOtp(otp);
+    if (providedHash !== activeOtp.otpHash) {
+      await prisma.emailOtp.update({
+        where: { id: activeOtp.id },
+        data: { attempts: { increment: 1 } }
+      });
+      const remaining = 5 - (activeOtp.attempts + 1);
+      return send(res, 400, { error: `Invalid verification code. ${remaining} attempts remaining.` });
+    }
+
+    // OTP is valid - delete it so it cannot be reused
+    await prisma.emailOtp.delete({ where: { id: activeOtp.id } });
+
+    // Mark user as verified
+    const user = await prisma.user.update({
+      where: { id: activeOtp.userId },
+      data: { isVerified: true },
+      include: { ips: true, activities: true }
+    });
+
+    const formatted = formatUserRecord(user);
+    cachedUsers.set(formatted.id, formatted);
+    return accountSessionResponse(req, res, formatted, 200);
   }
   if (pathname === '/api/account/logout' && req.method === 'POST') {
     const token = parseCookies(req).c1_user;
@@ -328,7 +753,7 @@ async function handleComments(req, res, pathname, requestUrl) {
     const user = currentUser(req);
     if (!guestAccessEnabled() && !user) return send(res, 401, { error: 'A registered account is required to view comments.' });
     if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
-    const store = readCommentStore();
+    const store = await readCommentStore();
     if (user) touchUser(user, req);
     const comments = store.items.filter(item => item.articleId === articleId).map(({ id, name, text, createdAt, updatedAt }) => ({ id, name, text, createdAt, updatedAt }));
     return send(res, 200, { comments, locked: store.lockedArticleIds.includes(articleId), user: publicUser(user) });
@@ -339,7 +764,7 @@ async function handleComments(req, res, pathname, requestUrl) {
     const input = await readRequestJson(req);
     const articleId = String(input.articleId || '').slice(0, 100);
     if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
-    const store = readCommentStore();
+    const store = await readCommentStore();
     if (store.lockedArticleIds.includes(articleId)) return send(res, 403, { error: 'Comments are closed for this guide.' });
     const ip = requestIp(req);
     const attempts = (commentAttempts.get(ip) || []).filter(value => Date.now() - value < 60 * 60 * 1000);
@@ -350,12 +775,22 @@ async function handleComments(req, res, pathname, requestUrl) {
     if (text.length < 2) return send(res, 400, { error: 'Write a comment before posting.' });
     attempts.push(Date.now());
     commentAttempts.set(ip, attempts);
-    const now = new Date().toISOString();
-    const comment = { id: crypto.randomBytes(12).toString('hex'), articleId, userId: user?.id || null, name, text, ip, createdAt: now, updatedAt: now };
-    store.items.push(comment);
-    writeJsonAtomic(commentsPath, store);
+    const now = new Date();
+    const commentId = crypto.randomBytes(12).toString('hex');
+    const created = await prisma.comment.create({
+      data: {
+        id: commentId,
+        articleId,
+        userId: user?.id || null,
+        name,
+        text,
+        ip,
+        createdAt: now,
+        updatedAt: now
+      }
+    });
     if (user) recordActivity(user.id, req, 'comment', `Commented on ${findArticle(articleId)?.title || articleId}`);
-    return send(res, 201, { comment: { id: comment.id, name: comment.name, text: comment.text, createdAt: comment.createdAt, updatedAt: comment.updatedAt } });
+    return send(res, 201, { comment: { id: created.id, name: created.name, text: created.text, createdAt: created.createdAt.toISOString(), updatedAt: created.updatedAt.toISOString() } });
   }
   return send(res, 405, { error: 'Method not allowed' });
 }
@@ -477,6 +912,7 @@ function legacyCategoryLabel(id) {
 }
 
 function loadArticles() {
+  if (cachedArticles.length > 0) return cachedArticles;
   const curated = readJson(articlesPath);
   const adminState = readAdminState();
   const deletedLegacy = new Set(adminState.deletedLegacy || []);
@@ -612,32 +1048,85 @@ function findArticle(id) {
   return loadArticles().find(article => article.id === id);
 }
 
-function saveAdminArticle(input, requestedId = '') {
-  const curated = readJson(articlesPath);
+async function saveAdminArticle(input, requestedId = '') {
   const existing = findArticle(requestedId || input.id || '');
   const article = cleanArticle({ ...input, id: requestedId || input.id || existing?.id }, existing);
   if (requestedId && article.id !== requestedId) throw new Error('Article ID cannot change during edit');
-  const index = curated.findIndex(item => item.id === article.id);
-  if (index >= 0) curated[index] = article;
-  else curated.push(article);
-  writeJsonAtomic(articlesPath, curated);
-  const state = readAdminState();
-  state.deletedLegacy = (state.deletedLegacy || []).filter(id => id !== article.id);
-  state.updated = new Date().toISOString().slice(0, 10);
-  writeJsonAtomic(adminStatePath, state);
-  return loadArticles().find(item => item.id === article.id);
+
+  const existingInDb = await prisma.article.findUnique({ where: { id: article.id } });
+  if (existingInDb) {
+    await prisma.articleSection.deleteMany({ where: { articleId: article.id } });
+    await prisma.article.update({
+      where: { id: article.id },
+      data: {
+        category: article.category,
+        categoryLabel: article.categoryLabel,
+        title: article.title,
+        summary: article.summary,
+        locations: article.locations,
+        categories: article.categories,
+        tags: article.tags,
+        status: article.status,
+        sources: article.sources || null,
+        sections: {
+          create: (article.sections || []).map(s => ({
+            heading: s.heading,
+            body: s.body || '',
+            html: s.html || null,
+            steps: s.steps || [],
+            checklist: s.checklist || [],
+            channels: {
+              create: (s.channels || []).map(c => ({
+                name: c.name || '',
+                contact: c.contact || '',
+                url: c.url || null
+              }))
+            }
+          }))
+        }
+      }
+    });
+  } else {
+    await prisma.article.create({
+      data: {
+        id: article.id,
+        category: article.category,
+        categoryLabel: article.categoryLabel,
+        title: article.title,
+        summary: article.summary,
+        locations: article.locations,
+        categories: article.categories,
+        tags: article.tags,
+        status: article.status,
+        sources: article.sources || null,
+        sections: {
+          create: (article.sections || []).map(s => ({
+            heading: s.heading,
+            body: s.body || '',
+            html: s.html || null,
+            steps: s.steps || [],
+            checklist: s.checklist || [],
+            channels: {
+              create: (s.channels || []).map(c => ({
+                name: c.name || '',
+                contact: c.contact || '',
+                url: c.url || null
+              }))
+            }
+          }))
+        }
+      }
+    });
+  }
+  await syncArticlesCache();
+  return findArticle(article.id);
 }
 
-function deleteAdminArticle(id) {
-  const curated = readJson(articlesPath);
-  const legacyExists = readJson(legacyPath).entries.some(entry => entry.id === id);
-  const next = curated.filter(article => article.id !== id);
-  if (next.length === curated.length && !legacyExists) return false;
-  writeJsonAtomic(articlesPath, next);
-  const state = readAdminState();
-  state.deletedLegacy = Array.from(new Set([...(state.deletedLegacy || []), ...(legacyExists ? [id] : [])]));
-  state.updated = new Date().toISOString().slice(0, 10);
-  writeJsonAtomic(adminStatePath, state);
+async function deleteAdminArticle(id) {
+  const existing = await prisma.article.findUnique({ where: { id } });
+  if (!existing) return false;
+  await prisma.article.delete({ where: { id } });
+  await syncArticlesCache();
   return true;
 }
 
@@ -661,10 +1150,9 @@ async function handleAdmin(req, res, pathname) {
   if (pathname === '/api/admin/access' && req.method === 'GET') return send(res, 200, { guestAccess: guestAccessEnabled() });
   if (pathname === '/api/admin/access' && req.method === 'PUT') {
     const input = await readRequestJson(req);
-    const state = readAdminState();
-    state.guestAccess = input.guestAccess === true;
-    writeJsonAtomic(adminStatePath, state);
-    return send(res, 200, { guestAccess: state.guestAccess });
+    const guestAccess = input.guestAccess === true;
+    await updateAdminState({ guestAccess });
+    return send(res, 200, { guestAccess });
   }
   if (pathname === '/api/admin/images' && req.method === 'POST') {
     const input = await readRequestJson(req);
@@ -687,24 +1175,21 @@ async function handleAdmin(req, res, pathname) {
     }
   }
   if (pathname === '/api/admin/users' && req.method === 'GET') {
-    const users = readUsers().sort((a, b) => String(b.lastSeenAt || '').localeCompare(String(a.lastSeenAt || '')));
+    const users = (await readUsers()).sort((a, b) => String(b.lastSeenAt || '').localeCompare(String(a.lastSeenAt || '')));
     return send(res, 200, { users });
   }
   const userMatch = pathname.match(/^\/api\/admin\/users\/([^/]+)$/);
   if (userMatch && req.method === 'DELETE') {
     const id = decodeURIComponent(userMatch[1]);
-    const users = readUsers();
-    const nextUsers = users.filter(user => user.id !== id);
-    if (nextUsers.length === users.length) return send(res, 404, { error: 'User not found' });
-    writeJsonAtomic(usersPath, nextUsers);
-    const commentStore = readCommentStore();
-    commentStore.items = commentStore.items.filter(comment => comment.userId !== id);
-    writeJsonAtomic(commentsPath, commentStore);
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing) return send(res, 404, { error: 'User not found' });
+    await prisma.user.delete({ where: { id } });
+    cachedUsers.delete(id);
     for (const [token, session] of userSessions) if (session.userId === id) userSessions.delete(token);
     return send(res, 200, { ok: true });
   }
   if (pathname === '/api/admin/comments' && req.method === 'GET') {
-    const store = readCommentStore();
+    const store = await readCommentStore();
     const comments = store.items.map(comment => ({ ...comment, articleTitle: findArticle(comment.articleId)?.title || comment.articleId })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
     return send(res, 200, { comments, lockedArticleIds: store.lockedArticleIds, articles: adminArticles().map(article => ({ id: article.id, title: article.title })) });
   }
@@ -712,30 +1197,36 @@ async function handleAdmin(req, res, pathname) {
     const input = await readRequestJson(req);
     const articleId = String(input.articleId || '');
     if (!findArticle(articleId)) return send(res, 404, { error: 'Guide not found' });
-    const store = readCommentStore();
-    store.lockedArticleIds = store.lockedArticleIds.filter(id => id !== articleId);
-    if (input.locked === true) store.lockedArticleIds.push(articleId);
-    writeJsonAtomic(commentsPath, store);
+    if (input.locked === true) {
+      await prisma.commentLock.upsert({
+        where: { articleId },
+        update: {},
+        create: { articleId }
+      });
+    } else {
+      await prisma.commentLock.deleteMany({ where: { articleId } });
+    }
+    const store = await readCommentStore();
     return send(res, 200, { lockedArticleIds: store.lockedArticleIds });
   }
   const commentMatch = pathname.match(/^\/api\/admin\/comments\/([^/]+)$/);
   if (commentMatch) {
     const id = decodeURIComponent(commentMatch[1]);
-    const store = readCommentStore();
-    const index = store.items.findIndex(comment => comment.id === id);
-    if (index < 0) return send(res, 404, { error: 'Comment not found' });
+    const existing = await prisma.comment.findUnique({ where: { id } });
+    if (!existing) return send(res, 404, { error: 'Comment not found' });
     if (req.method === 'PUT') {
       const input = await readRequestJson(req);
       const name = String(input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
       const text = String(input.text || '').trim().slice(0, 2000);
       if (name.length < 2 || text.length < 2) return send(res, 400, { error: 'A name and comment text are required.' });
-      store.items[index] = { ...store.items[index], name, text, updatedAt: new Date().toISOString(), editedByAdmin: true };
-      writeJsonAtomic(commentsPath, store);
-      return send(res, 200, { comment: store.items[index] });
+      const updated = await prisma.comment.update({
+        where: { id },
+        data: { name, text, editedByAdmin: true, updatedAt: new Date() }
+      });
+      return send(res, 200, { comment: { id: updated.id, name: updated.name, text: updated.text, createdAt: updated.createdAt.toISOString(), updatedAt: updated.updatedAt.toISOString(), editedByAdmin: true } });
     }
     if (req.method === 'DELETE') {
-      store.items.splice(index, 1);
-      writeJsonAtomic(commentsPath, store);
+      await prisma.comment.delete({ where: { id } });
       return send(res, 200, { ok: true });
     }
   }
@@ -744,7 +1235,7 @@ async function handleAdmin(req, res, pathname) {
     const input = await readRequestJson(req);
     const id = slugify(input.id || input.title);
     if (findArticle(id)) return send(res, 409, { error: 'An article with this ID already exists' });
-    try { return send(res, 201, { article: saveAdminArticle(input) }); } catch (error) { return send(res, 400, { error: error.message }); }
+    try { return send(res, 201, { article: await saveAdminArticle(input) }); } catch (error) { return send(res, 400, { error: error.message }); }
   }
   const match = pathname.match(/^\/api\/admin\/articles\/([^/]+)$/);
   if (!match) return send(res, 404, { error: 'Admin route not found' });
@@ -752,9 +1243,9 @@ async function handleAdmin(req, res, pathname) {
   if (req.method === 'PUT') {
     if (!findArticle(id)) return send(res, 404, { error: 'Article not found' });
     const input = await readRequestJson(req);
-    try { return send(res, 200, { article: saveAdminArticle(input, id) }); } catch (error) { return send(res, 400, { error: error.message }); }
+    try { return send(res, 200, { article: await saveAdminArticle(input, id) }); } catch (error) { return send(res, 400, { error: error.message }); }
   }
-  if (req.method === 'DELETE') { const deleted = deleteAdminArticle(id); return send(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: 'Article not found' }); }
+  if (req.method === 'DELETE') { const deleted = await deleteAdminArticle(id); return send(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: 'Article not found' }); }
   return send(res, 405, { error: 'Method not allowed' });
 }
 
@@ -909,6 +1400,8 @@ const requestHandler = (req, res) => {
 
 const server = http.createServer(requestHandler);
 
+const initDbPromise = Promise.all([syncUsersCache(), syncArticlesCache(), syncAdminState()]).catch(console.error);
+
 if (require.main === module) server.listen(PORT, () => console.log(`Citizen One knowledge base on localhost:${PORT}`));
 
-module.exports = { loadArticles, norm, searchArticles, server, requestHandler };
+module.exports = { loadArticles, norm, searchArticles, server, requestHandler, initDbPromise };
