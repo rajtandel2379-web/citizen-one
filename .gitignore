@@ -2,4 +2,3 @@
 node_modules
 data/users.json*
 data/comments.json*
-.env

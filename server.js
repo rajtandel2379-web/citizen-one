@@ -80,6 +80,10 @@ async function sendBrevoOtpEmail(email, otp) {
     sender: { name: senderName, email: senderEmail },
     to: [{ email }],
     subject: `Your Citizen One verification code: ${otp}`,
+    tags: ['authentication-otp'],
+    headers: {
+      'X-Mailin-Tag': 'auth-otp'
+    },
     htmlContent: `
       <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #dfe7e0; border-radius: 12px;">
         <h2 style="color: #17634a; margin-top: 0;">Citizen One Verification</h2>
