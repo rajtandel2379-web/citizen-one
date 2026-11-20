@@ -1413,7 +1413,22 @@ const requestHandler = (req, res) => {
 
 const server = http.createServer(requestHandler);
 
-const initDbPromise = Promise.all([syncUsersCache(), syncArticlesCache(), syncAdminState()]).catch(console.error);
+async function initDb(retries = 3, delay = 2000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await prisma.$connect();
+      await Promise.all([syncUsersCache(), syncArticlesCache(), syncAdminState()]);
+      console.log(`Database connected (attempt ${attempt})`);
+      return;
+    } catch (error) {
+      console.error(`Database init attempt ${attempt}/${retries} failed:`, error.message);
+      if (attempt < retries) await new Promise(resolve => setTimeout(resolve, delay * attempt));
+    }
+  }
+  console.error('Database init failed after all retries — falling back to file-based data');
+}
+
+const initDbPromise = initDb();
 
 if (require.main === module) server.listen(PORT, () => console.log(`Citizen One knowledge base on localhost:${PORT}`));
 
