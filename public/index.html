@@ -99,6 +99,15 @@ h1{margin:0;max-width:760px;font-size:clamp(34px,5vw,60px);line-height:1.06;lett
 .back-link{margin:28px 0 25px}.back-link a{font-weight:650;text-decoration:none;display:inline-flex;align-items:center;gap:4px}.back-link a:hover{text-decoration:underline}
 .simple-page{padding-bottom:60px}.simple-page h1{max-width:800px}.simple-page h2{font-size:22px;margin:0 0 10px;font-weight:750}
 .error-page{text-align:center;padding:90px 20px}.error-page .eyebrow{font-size:13px}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;margin-top:8px}
+.team-card{padding:28px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:var(--shadow);transition:var(--transition)}
+.team-card:hover{transform:translateY(-2.5px);box-shadow:var(--shadow-hover)}
+.team-avatar{width:64px;height:64px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:850;font-size:20px;letter-spacing:-.02em;margin-bottom:16px;box-shadow:0 2px 8px rgba(23,99,74,.25)}
+.team-card h2{margin:0 0 4px;font-size:22px;letter-spacing:-.03em;font-weight:750}
+.team-role{margin:0 0 14px;color:var(--brand);font-size:14px;font-weight:700;letter-spacing:.02em}
+.team-bio{margin:0 0 18px;color:var(--muted);font-size:14.5px;line-height:1.6}
+.team-card .channels{margin-top:0}
+@media(max-width:560px){.team-grid{grid-template-columns:1fr}}
 .detail-section{padding:30px 0;border-bottom:1px solid var(--line)}
 .detail-section h2{font-size:20px;letter-spacing:-.02em;margin:0 0 14px;font-weight:750}
 .detail-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--brand);margin:0 0 12px;font-weight:800}
@@ -142,7 +151,7 @@ h1{margin:0;max-width:760px;font-size:clamp(34px,5vw,60px);line-height:1.06;lett
 <div class="shell">
   <header class="topbar">
     <a class="brand" href="/" aria-label="Citizen One home"><span class="brand-mark">C1</span><span>Citizen One</span></a>
-    <nav id="site-nav" class="site-nav" aria-label="Primary"><a href="/">Guides</a><a href="/about">About</a><a href="#faq">FAQ</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/admin">Admin</a><button type="button" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">◐</button><button type="button" data-privacy-toggle aria-label="Toggle privacy view" aria-pressed="false">◉</button></nav>
+    <nav id="site-nav" class="site-nav" aria-label="Primary"><a href="/">Guides</a><a href="/about">About</a><a href="/team">Team</a><a href="#faq">FAQ</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/admin">Admin</a><button type="button" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">◐</button><button type="button" data-privacy-toggle aria-label="Toggle privacy view" aria-pressed="false">◉</button></nav>
     <span class="topnote">Open civic reporting guides</span>
     <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
   </header>
@@ -179,7 +188,7 @@ h1{margin:0;max-width:760px;font-size:clamp(34px,5vw,60px);line-height:1.06;lett
   </main>
 
   <section class="faq" id="faq" aria-labelledby="faq-title"><h2 id="faq-title">Frequently asked</h2><details><summary>How do I use a guide?</summary><p>Search for an issue, choose a location or category tag, then open the guide for the authority, evidence checklist and escalation steps.</p></details><details><summary>Can I report an emergency here?</summary><p>No. For immediate danger or a crime in progress, call 112 first. These pages explain non-emergency reporting routes.</p></details><details><summary>How are new guides added?</summary><p>Developers add a structured article to <code>data/articles.json</code>, assign tags from <code>data/tags.json</code>, then publish the update.</p></details></section>
-  <footer class="footer"><span>© <span id="copyright-year"></span> Citizen One · Views expressed are personal.</span><span>Designed, Ideated, and Ran by Raj Tandel.</span><span><a href="/">Guides</a> · <a href="/about">About</a> · <a href="#faq">FAQ</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/admin">Admin</a> · <a href="/sitemap.xml">Sitemap</a></span></footer>
+  <footer class="footer"><span>© <span id="copyright-year"></span> Citizen One · Views expressed are personal.</span><span>Designed, Ideated, and Ran by Raj Tandel.</span><span><a href="/">Guides</a> · <a href="/about">About</a> · <a href="/team">Team</a> · <a href="#faq">FAQ</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/admin">Admin</a> · <a href="/sitemap.xml">Sitemap</a></span></footer>
 </div>
 
 <a class="floating-contact" id="floating-contact" href="mailto:?subject=Citizen%20One%20feedback" aria-label="Contact Citizen One">Contact</a>
